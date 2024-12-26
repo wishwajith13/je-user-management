@@ -23,8 +23,8 @@ public class Application {
     private String applicationTitle;
     @Column(name="date_of_birth",nullable = false)
     private Date dateOfBirth;
-    @Column(name="plase_of_birth")
-    private String plaseOfBirth;
+    @Column(name="place_of_birth")
+    private String placeOfBirth;
     @Column(name = "age",nullable = false)
     private int age;
     @Column(name = "family_name",nullable = false)
@@ -76,7 +76,7 @@ public class Application {
     @Column(name = "applied_for_visa_before",nullable = false)
     private boolean appliedForVisaBefore;
     @Column(name = "country_visa_type_appiled")
-    private String countryVisaTypeAppiled;
+    private String countryVisaTypeApplied;
     @Column(name = "visa_refusals",nullable = false)
     private boolean visaRefusals;
     @Column(name = "visa_refusals_details")
