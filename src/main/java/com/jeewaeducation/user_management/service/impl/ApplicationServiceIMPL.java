@@ -3,11 +3,12 @@ package com.jeewaeducation.user_management.service.impl;
 import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
 import com.jeewaeducation.user_management.entity.Application;
+import com.jeewaeducation.user_management.exception.DuplicateKeyException;
+import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.ApplicationRepo;
 import com.jeewaeducation.user_management.service.ApplicationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,7 +35,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
             applicationRepo.deleteById(applicationId);
             return applicationId + " Deleted";
         } else {
-            throw new RuntimeException("Application not found");
+            throw new NotFoundException("Application not found");
         }
     }
 
@@ -43,7 +44,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
         if (applicationRepo.existsById(applicationId)) {
             return modelMapper.map(applicationRepo.findById(applicationId), ApplicationGetDTO.class);
         } else {
-            throw new RuntimeException("Application not found");
+            throw new NotFoundException("Application not found");
         }
     }
 }
