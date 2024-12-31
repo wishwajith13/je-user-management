@@ -2,6 +2,7 @@ package com.jeewaeducation.user_management.controller;
 
 import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
+import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
 import com.jeewaeducation.user_management.service.ApplicationService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +39,13 @@ public class ApplicationController {
     public ResponseEntity<StandardResponse> getApplication(@PathVariable(value = "id") int applicationId) {
         ApplicationGetDTO applicationGetDTO = applicationService.getApplication(applicationId);
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", applicationGetDTO), HttpStatus.OK);
+    }
+
+    @PutMapping(
+            path = {"/update"}
+    )
+    public ResponseEntity<StandardResponse> updateApplication(@RequestBody ApplicationUpdateDTO applicationUpdateDTO) {
+        String message = applicationService.updateApplication(applicationUpdateDTO);
+        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 }

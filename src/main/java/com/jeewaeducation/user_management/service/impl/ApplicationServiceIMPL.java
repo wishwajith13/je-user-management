@@ -2,6 +2,7 @@ package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
+import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.exception.DuplicateKeyException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
@@ -41,8 +42,17 @@ public class ApplicationServiceIMPL implements ApplicationService {
 
     @Override
     public ApplicationGetDTO getApplication(int applicationId) {
-        if (applicationRepo.existsById(applicationId)) {
-            return modelMapper.map(applicationRepo.findById(applicationId), ApplicationGetDTO.class);
+        Application application = applicationRepo.findById(applicationId)
+                .orElseThrow(() -> new NotFoundException("Application not found with ID: " + applicationId));
+        return modelMapper.map(application, ApplicationGetDTO.class);
+    }
+
+    @Override
+    public String updateApplication(ApplicationUpdateDTO applicationUpdateDTO) {
+        Application application = modelMapper.map(applicationUpdateDTO, Application.class);
+        if (applicationRepo.existsById(application.getApplicationId())) {
+            applicationRepo.save(application);
+            return application.getApplicationId() + "Updated";
         } else {
             throw new NotFoundException("Application not found");
         }
