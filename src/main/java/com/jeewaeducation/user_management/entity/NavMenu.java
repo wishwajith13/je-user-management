@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,5 +22,8 @@ public class NavMenu {
 
     @Column( nullable = false)
     private String label;
+
+    @OneToMany(mappedBy = "navMenu",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<MenuVisibleRole> menuVisibleRoles;
 
 }
