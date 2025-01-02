@@ -11,8 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class NavigationMenuGetDTO {
-    private int menu_id;
     private String href;
     private String label;
-    private List<MenuVisibleRole> menuVisibleRoles;
+    private List<String> visible;
 }
