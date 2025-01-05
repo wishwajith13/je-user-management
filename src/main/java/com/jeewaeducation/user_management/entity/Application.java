@@ -89,5 +89,9 @@ public class Application {
     private String preferredCity;
     @Column(name = "methode_of_Knowing",nullable = false)
     private String methodeOfKnowing;
+    @ManyToOne
+    @JoinColumn(name = "reception_id")
+    private Reception reception;
+    
     //validate name and student id have to add
 }
