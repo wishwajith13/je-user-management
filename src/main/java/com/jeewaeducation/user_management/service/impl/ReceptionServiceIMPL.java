@@ -43,11 +43,10 @@ public class ReceptionServiceIMPL implements ReceptionService {
     @Override
     public List<ReceptionDTO> getAllReception() {
         List<Reception> receptions = receptionRepo.findAll();
-        if (!receptions.isEmpty()) {
-            return receptionMapper.entitListToDtoList(receptions);
-        } else {
+        if (receptions.isEmpty()) {
             throw new NotFoundException("No receptions found");
         }
+        return receptionMapper.entitListToDtoList(receptions);
     }
 
     @Override

@@ -58,9 +58,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
         Application application = applicationRepo.findById(applicationId).orElseThrow(() -> new NotFoundException("Application not found with ID: " + applicationId));
         ApplicationGetDTO applicationGetDTO = modelMapper.map(application, ApplicationGetDTO.class);
         Reception reception = application.getReception();
-        ReceptionDTO receptionDTO = new ReceptionDTO();
-        receptionDTO.setReceptionId(reception.getReceptionId());//only got id and name
-        receptionDTO.setReceptionName(reception.getReceptionName());
+        ReceptionDTO receptionDTO = modelMapper.map(reception, ReceptionDTO.class);//only got id and name
         applicationGetDTO.setReception(receptionDTO);
         return applicationGetDTO;
     }
