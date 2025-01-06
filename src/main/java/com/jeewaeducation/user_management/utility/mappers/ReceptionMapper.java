@@ -8,5 +8,5 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ReceptionMapper {
-    List<ReceptionDTO> entitListToDtoList(List<Reception> receptionList);
+    List<ReceptionDTO> entitListToDtoList(List<Reception> items);
 }

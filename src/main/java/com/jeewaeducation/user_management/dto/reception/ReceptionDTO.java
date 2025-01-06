@@ -11,4 +11,7 @@ import lombok.Setter;
 public class ReceptionDTO {
     private int receptionId;
     private String receptionName;
+    private String receptionAddress;
+    private int receptionContact;
+    private String receptionEmail;
 }
