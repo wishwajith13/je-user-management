@@ -1,0 +1,22 @@
+package com.jeewaeducation.user_management.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class Student {
+    @Id
+    @Column(name = "student_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int studentId;
+    @Column(name = "Student_rating", nullable = false)
+    private String studentRating;
+    @Column(name = "student_status", nullable = false)
+    private String studentStatus;
+    //counsillor id and branch id should be added
+}
