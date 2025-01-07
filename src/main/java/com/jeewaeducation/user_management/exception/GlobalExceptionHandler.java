@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<StandardResponse> handleNotFoundException(DuplicateKeyException exception) {
+    public ResponseEntity<StandardResponse> handleDuplicateKeyException(DuplicateKeyException exception) {
         return new ResponseEntity<StandardResponse>(
                 new StandardResponse(404, "Not Found", exception.getMessage()), HttpStatus.NOT_FOUND
         );

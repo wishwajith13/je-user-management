@@ -2,6 +2,7 @@ package com.jeewaeducation.user_management.controller;
 
 import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
+import com.jeewaeducation.user_management.dto.application.ApplicationStudentBasicDetailsGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
 import com.jeewaeducation.user_management.service.ApplicationService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/application")
@@ -39,6 +42,23 @@ public class ApplicationController {
     public ResponseEntity<StandardResponse> getApplication(@PathVariable(value = "id") int applicationId) {
         ApplicationGetDTO applicationGetDTO = applicationService.getApplication(applicationId);
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", applicationGetDTO), HttpStatus.OK);
+    }
+
+    @GetMapping(
+            path = {"/getStu/{id}"}
+
+    )
+    public ResponseEntity<StandardResponse> getStudentBasicDetails(@PathVariable int id) { //retiring basic details of student
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = applicationService.getStudentBasicDetails(id);
+        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", applicationStudentBasicDetailsGetDTO), HttpStatus.OK);
+    }
+
+    @GetMapping(
+            path = {"/getStuAll"}
+    )
+    private ResponseEntity<StandardResponse> getAllStudentBasicDetails() { //retiring basic details of student
+        List<ApplicationStudentBasicDetailsGetDTO> applicationStudentBasicDetailsGetDTO = applicationService.getAllStudentBasicDetails();
+        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", applicationStudentBasicDetailsGetDTO), HttpStatus.OK);
     }
 
     @PutMapping(

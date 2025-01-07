@@ -2,6 +2,7 @@ package com.jeewaeducation.user_management.dto.application;
 
 
 
+import com.jeewaeducation.user_management.dto.reception.ReceptionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,4 +50,5 @@ public class ApplicationGetDTO {
     private String preferredStudyCountry;
     private String preferredCity;
     private String methodeOfKnowing;
+    private ReceptionDTO reception;
 }
