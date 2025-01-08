@@ -17,7 +17,7 @@ public class NavMenu {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int menu_id;
 
-    @Column(nullable = false)
+
     private String href;
 
     @Column( nullable = false)
@@ -25,5 +25,7 @@ public class NavMenu {
 
     @OneToMany(mappedBy = "navMenu",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<MenuVisibleRole> menuVisibleRoles;
+    
+    
 
 }
