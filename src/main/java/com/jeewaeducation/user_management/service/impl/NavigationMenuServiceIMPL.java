@@ -16,11 +16,14 @@ import java.util.stream.Collectors;
 @Service
 public class NavigationMenuServiceIMPL implements NavigationMenuService {
 
-    @Autowired
     private NavigationMenuRepository menuRepository;
+    private ModelMapper modelMapper;
 
     @Autowired
-    private ModelMapper modelMapper;
+    public NavigationMenuServiceIMPL(NavigationMenuRepository menuRepository, ModelMapper modelMapper) {
+        this.menuRepository = menuRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public List<NavigationMenuGetDTO> getAllNavigationMenu() {

@@ -11,6 +11,6 @@ import java.util.Date;
 @NoArgsConstructor
 public class EventSaveDto {
     private String title;
-    private Date date;
+    private String date;
     private String time;
 }

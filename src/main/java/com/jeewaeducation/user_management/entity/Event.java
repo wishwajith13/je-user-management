@@ -17,7 +17,7 @@ public class Event {
     private String title;
 
     @Column(nullable = false)
-    private Date date;
+    private String date;
 
     @Column(nullable = false)
     private String time;

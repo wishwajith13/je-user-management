@@ -9,18 +9,25 @@ import com.jeewaeducation.user_management.service.EventService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import org.springframework.stereotype.Service;
 import java.util.List;
+
 
 @Service
 public class EventServiceIMPL implements EventService {
 
-    @Autowired
-    private ModelMapper modelMapper;
+
+    private final ModelMapper modelMapper;
+    private final EventRepo eventRepo;
+
 
     @Autowired
-    private EventRepo eventRepo;
+    public EventServiceIMPL(ModelMapper modelMapper, EventRepo eventRepo) {
+        this.modelMapper = modelMapper;
+        this.eventRepo = eventRepo;
+
+    }
 
     @Override
     public List<EventGetDto> getAllEvents() {
@@ -28,15 +35,12 @@ public class EventServiceIMPL implements EventService {
             return modelMapper.map(events, new TypeToken<List<EventGetDto>>() {}.getType());
     }
 
-    @Override
-    public List<EventGetDto> getEventsByDate(String date) {
-        return List.of();
-    }
+
 
     @Override
     public String saveEvent(EventSaveDto eventSaveDTO) {
         Event event = modelMapper.map(eventSaveDTO, Event.class);
-        if(!eventRepo.existsById(event.getId())){
+        if(eventRepo.findById(event.getId()).isEmpty()){
             return eventRepo.save(event)+"Event Saved";
         }else{
             throw new NotFoundException("Event Not Found");
@@ -46,14 +50,37 @@ public class EventServiceIMPL implements EventService {
 
     @Override
     public String deleteEvent(int eventId) {
-        return null;
+        if(eventRepo.existsById(eventId)){
+            eventRepo.deleteById(eventId);
+            return "Event with ID"+eventId+"has been Deleted";
+        }else{
+            throw new NotFoundException("Event Not Found");
+        }
+
     }
 
     @Override
-    public Event getEvent(int eventId) {
-        return null;
+    public EventGetDto getEvent(int eventId) {
+        if(eventRepo.existsById(eventId)){
+            Event event = eventRepo.findById(eventId).orElseThrow(() -> new NotFoundException("Event Not Found"));
+            return modelMapper.map(event,EventGetDto.class);
+        }else {
+            throw new NotFoundException("Event Not Found");
+        }
     }
-
-
-
+    
+    @Override
+    public String updateEvent(Event event, int id) {
+        if(eventRepo.existsById(id)){
+            Event existingEvent = eventRepo.findById(id).orElseThrow(() -> new NotFoundException("Event Not Found"));
+            existingEvent.setId(id);
+            existingEvent.setTime(event.getTime());
+            existingEvent.setDate(event.getDate());
+            existingEvent.setTitle(event.getTitle());
+            eventRepo.save(existingEvent);
+            return "Successfully Updated " + id;
+        } else {
+            throw new NotFoundException("Event Not Found");
+        }
+    }
 }

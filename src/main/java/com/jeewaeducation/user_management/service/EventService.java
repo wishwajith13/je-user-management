@@ -11,9 +11,9 @@ public interface EventService {
 
     String deleteEvent(int eventId);
 
-    Event getEvent(int eventId);
+    EventGetDto getEvent(int eventId);
 
     List<EventGetDto> getAllEvents();
 
-    List<EventGetDto> getEventsByDate(String date);
+    String updateEvent(Event event,int id);
 }

@@ -13,6 +13,6 @@ import java.util.Date;
 public class EventGetDto {
     private int id;
     private String title;
-    private Date date;
+    private String date;
     private String time;
 }
