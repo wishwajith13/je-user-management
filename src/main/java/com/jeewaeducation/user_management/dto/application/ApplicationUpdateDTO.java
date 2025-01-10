@@ -1,8 +1,6 @@
 package com.jeewaeducation.user_management.dto.application;
 
-
-
-import com.jeewaeducation.user_management.dto.reception.ReceptionDTO;
+import com.jeewaeducation.user_management.entity.Reception;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ApplicationGetDTO {
+public class ApplicationUpdateDTO {
     private int applicationId;
     private Date applicationDate;
     private String applicationTitle;
@@ -50,5 +48,5 @@ public class ApplicationGetDTO {
     private String preferredStudyCountry;
     private String preferredCity;
     private String methodeOfKnowing;
-    private ReceptionDTO reception;
+    private int reception;
 }
