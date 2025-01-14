@@ -3,6 +3,7 @@ package com.jeewaeducation.user_management.service.impl;
 import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
 import com.jeewaeducation.user_management.dto.counselor.CounselorSaveDTO;
 import com.jeewaeducation.user_management.entity.Counselor;
+import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.service.CounselorService;
 import org.modelmapper.ModelMapper;
@@ -57,7 +58,12 @@ public class CounselorServiceIMPL implements CounselorService {
 
     @Override
     public CounselorGetDTO getCounselor(int counselorId) {
-        return null;
+        if(counselorRepo.existsById(counselorId)){
+            Counselor counselor = counselorRepo.findById(counselorId).orElseThrow(() -> new NotFoundException("Counselor not found"));
+            return modelMapper.map(counselor, CounselorGetDTO.class);
+        }else{
+            throw new NotFoundException("Counselor Not Found");
+        }
     }
 
     @Override
@@ -65,11 +71,5 @@ public class CounselorServiceIMPL implements CounselorService {
         List<Counselor> counselors = counselorRepo.findAll();
         return modelMapper.map(counselors, new TypeToken<List<CounselorGetDTO>>() {}.getType());
     }
-
-    @Override
-    public CounselorGetDTO getCounselorsByBranch(int branchId) {
-        return null;
-    }
-
 
 }

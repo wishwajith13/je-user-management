@@ -15,7 +15,4 @@ public interface CounselorService {
     CounselorGetDTO getCounselor(int counselorId);
 
     List<CounselorGetDTO> getAllCounselors();
-
-    CounselorGetDTO getCounselorsByBranch(int branchId);
-    
 }
