@@ -27,10 +27,11 @@ public class StudentController {
     }
 
     @PutMapping(
-            path = {"/update"}
+            path = {"/update/{id}"}
     )
-    public ResponseEntity<StandardResponse> updateStudent(@RequestBody StudentDTO studentDTO) {
-        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", studentService.updateStudent(studentDTO)), HttpStatus.OK);
+    public ResponseEntity<StandardResponse> updateStudent(@RequestBody StudentSaveDTO studentSaveDTO, @PathVariable int id) {
+        String message = studentService.updateStudent(studentSaveDTO, id);
+        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 
     @DeleteMapping(

@@ -9,7 +9,7 @@ public interface StudentService {
 
     String saveStudent(StudentSaveDTO studentSaveDTO);
 
-    String updateStudent(StudentDTO studentDTO);
+    String updateStudent(StudentSaveDTO studentSaveDTO, int studentId);
 
     String deleteStudent(int id);
 
