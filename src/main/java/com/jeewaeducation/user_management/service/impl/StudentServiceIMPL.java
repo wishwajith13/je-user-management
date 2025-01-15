@@ -34,6 +34,7 @@ public class StudentServiceIMPL implements StudentService {
 
         Student student = modelMapper.map(studentSaveDTO, Student.class);
         student.setCounselorId(counselor);
+        student.setStudentId(0);
         System.out.println(student);
         studentRepo.save(student);
         return "Student ID: " + student.getStudentId() + " Saved";
