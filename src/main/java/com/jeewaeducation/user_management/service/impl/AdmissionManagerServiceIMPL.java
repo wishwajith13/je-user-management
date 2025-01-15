@@ -10,6 +10,7 @@ import com.jeewaeducation.user_management.service.AdmissionManagerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.jeewaeducation.user_management.utility.mappers.AdmissionManagerMapper;
 
 import java.util.List;
 
@@ -19,8 +20,8 @@ public class AdmissionManagerServiceIMPL implements AdmissionManagerService {
     private AdmissionManagerRepo admissionManagerRepo;
     @Autowired
     private ModelMapper modelMapper;
-   // @Autowired
-  //  private AdmissionManagerMapper admissionManagerMapper;
+    @Autowired
+    private AdmissionManagerMapper admissionManagerMapper;
 
     @Override
     public String saveAdmissionManager(AdmissionManagerSaveDTO admissionManagerSaveDTO) {
@@ -41,17 +42,12 @@ public class AdmissionManagerServiceIMPL implements AdmissionManagerService {
 
     @Override
     public List<AdmissionManagerDTO> getAllAdmissionManager() {
-        return List.of();
-    }
-
-  /*  @Override
-    public List<AdmissionManagerDTO> getAllAdmissionManager() {
         List<AdmissionManager> admissionManagers = admissionManagerRepo.findAll();
         if (admissionManagers.isEmpty()) {
-            throw new NotFoundException("No receptions found");
+            throw new NotFoundException("No Admission Manager found");
         }
         return admissionManagerMapper.entityListToDtoList(admissionManagers);
-    }*/
+    }
 
     @Override
     public String updateAdmissionManager(AdmissionManagerDTO admissionManagerDTO) {
@@ -59,5 +55,12 @@ public class AdmissionManagerServiceIMPL implements AdmissionManagerService {
         admissionManagerRepo.findById(admissionManager.getAdmissionManagerId()).orElseThrow(() -> new NotFoundException("AdmissionManager not found"));
         admissionManagerRepo.save(admissionManager);
         return admissionManager.getAdmissionManagerId() + " Updated";
+    }
+
+    @Override
+    public AdmissionManagerDTO getAdmissionManagerById(int id) {
+        AdmissionManager admissionManager = admissionManagerRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("AdmissionManager not found"));
+        return modelMapper.map(admissionManager, AdmissionManagerDTO.class);
     }
 }

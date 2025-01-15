@@ -52,4 +52,12 @@ public class AdmissionManagerController {
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 
+    @GetMapping(
+            path = {"/get/{id}"}
+    )
+    public ResponseEntity<StandardResponse> getAdmissionManagerById(@PathVariable int id) {
+        AdmissionManagerDTO message = admissionManagerService.getAdmissionManagerById(id);
+        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
+    }
+
 }
