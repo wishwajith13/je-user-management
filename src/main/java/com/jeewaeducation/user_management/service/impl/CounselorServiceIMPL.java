@@ -42,7 +42,6 @@ public class CounselorServiceIMPL implements CounselorService {
             return "Counselor with ID"+counselorId+"has been Deleted";
         }else{
             throw new NotFoundException("Counselor Not Found");
-//            return "Counselor Not Found";
         }
     }
 
@@ -54,7 +53,6 @@ public class CounselorServiceIMPL implements CounselorService {
             return counselorRepo.save(counselor)+"Counselor Updated";
         }else{
             throw new NotFoundException("Counselor Not Found");
-//            return "Counselor Not Found";
         }
     }
 
