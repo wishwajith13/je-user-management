@@ -13,4 +13,6 @@ public interface AdmissionManagerService {
     List<AdmissionManagerDTO> getAllAdmissionManager();
 
     String updateAdmissionManager(AdmissionManagerDTO admissionManagerDTO);
+
+    AdmissionManagerDTO getAdmissionManagerById(int id);
 }
