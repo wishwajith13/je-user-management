@@ -24,7 +24,7 @@ public class StudentServiceIMPL implements StudentService {
     private StudentMapper studentMapper;
 
     @Override
-    public String saveStudent(StudentSaveDTO studentSaveDTO) {
+    public String saveStudent(StudentSaveDTO studentSaveDTO) {//TODO: exception handling
         Student student = modelMapper.map(studentSaveDTO, Student.class);
         studentRepo.save(student);
         return student.getStudentId() + " Saved";
