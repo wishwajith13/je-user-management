@@ -28,11 +28,11 @@ public class CounselorServiceIMPL implements CounselorService {
     @Override
     public String saveCounselor(CounselorSaveDTO counselorSaveDTO) {
         Counselor counselor = modelMapper.map(counselorSaveDTO, Counselor.class);
-        if(counselorRepo.findById(counselor.getCounselorId()).isEmpty()){
-            return counselorRepo.save(counselor)+"Counselor Saved";
-        }else{
-            return "Counselor Not Found";
-        }
+//        System.out.println("Saving Counselor: " + counselor);
+        counselor.setCounselorId(0); // Ensure counselorId is not set from DTO
+//        System.out.println("Saving Counselor: " + counselor);
+        counselorRepo.save(counselor);
+        return counselor.getCounselorId() + " Saved";
     }
 
     @Override
@@ -41,7 +41,7 @@ public class CounselorServiceIMPL implements CounselorService {
             counselorRepo.deleteById(counselorId);
             return "Counselor with ID"+counselorId+"has been Deleted";
         }else{
-            return "Counselor Not Found";
+            throw new NotFoundException("Counselor Not Found");
         }
     }
 
@@ -52,7 +52,7 @@ public class CounselorServiceIMPL implements CounselorService {
             counselor.setCounselorId(counselorId);
             return counselorRepo.save(counselor)+"Counselor Updated";
         }else{
-            return "Counselor Not Found";
+            throw new NotFoundException("Counselor Not Found");
         }
     }
 
