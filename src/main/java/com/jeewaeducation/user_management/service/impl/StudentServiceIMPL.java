@@ -3,8 +3,10 @@ package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.student.StudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
+import com.jeewaeducation.user_management.entity.Counselor;
 import com.jeewaeducation.user_management.entity.Student;
 import com.jeewaeducation.user_management.exception.NotFoundException;
+import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.StudentService;
 import com.jeewaeducation.user_management.utility.mappers.StudentMapper;
@@ -19,21 +21,32 @@ public class StudentServiceIMPL implements StudentService {
     @Autowired
     private StudentRepo studentRepo;
     @Autowired
+    private CounselorRepo counselorRepo;
+    @Autowired
     private ModelMapper modelMapper;
     @Autowired
     private StudentMapper studentMapper;
 
     @Override
-    public String saveStudent(StudentSaveDTO studentSaveDTO) {//TODO: exception handling
+    public String saveStudent(StudentSaveDTO studentSaveDTO)    {
+
+        Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId()).orElseThrow(() -> new NotFoundException("Counselor not found"));
+
         Student student = modelMapper.map(studentSaveDTO, Student.class);
+        student.setCounselorId(counselor);
+        System.out.println(student);
         studentRepo.save(student);
-        return student.getStudentId() + " Saved";
+        return "Student ID: " + student.getStudentId() + " Saved";
     }
 
     @Override
-    public String updateStudent(StudentDTO studentDTO) {
-        Student student = modelMapper.map(studentDTO, Student.class);
-        studentRepo.findById(student.getStudentId()).orElseThrow(() -> new NotFoundException("Student not found"));
+    public String updateStudent(StudentSaveDTO studentSaveDTO, int studentId) {
+        Student student = modelMapper.map(studentSaveDTO, Student.class);
+        studentRepo.findById(studentId).orElseThrow(() -> new NotFoundException("Student not found"));
+        student.setStudentId(studentId);
+        Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId())
+                .orElseThrow(() -> new NotFoundException("Counselor not found with ID: " + studentSaveDTO.getCounselorId()));
+        student.setCounselorId(counselor);
         studentRepo.save(student);
         return student.getStudentId() + " Updated";
     }
