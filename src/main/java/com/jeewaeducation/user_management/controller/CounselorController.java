@@ -20,7 +20,7 @@ public class CounselorController {
     @PostMapping("/save")
     public ResponseEntity<StandardResponse> saveCounselor(@RequestBody CounselorSaveDTO counselorSaveDTO){
         String message = counselorService.saveCounselor(counselorSaveDTO);
-        return new ResponseEntity<StandardResponse>(new StandardResponse(201,"success",message), HttpStatus.OK);
+        return new ResponseEntity<StandardResponse>(new StandardResponse(201,"success",message), HttpStatus.CREATED);
     }
 
     @GetMapping("/get/{id}")
