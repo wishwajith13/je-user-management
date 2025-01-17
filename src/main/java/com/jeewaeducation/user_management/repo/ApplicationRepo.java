@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @EnableJpaRepositories
 public interface ApplicationRepo extends JpaRepository<Application, Integer> {
 
+
+    boolean existsByReception_ReceptionId(int receptionReceptionId);
 }

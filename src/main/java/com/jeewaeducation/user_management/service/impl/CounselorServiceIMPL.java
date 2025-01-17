@@ -4,9 +4,11 @@ import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
 import com.jeewaeducation.user_management.dto.counselor.CounselorSaveDTO;
 import com.jeewaeducation.user_management.entity.Branch;
 import com.jeewaeducation.user_management.entity.Counselor;
+import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.repo.CounselorRepo;
+import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.CounselorService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -21,12 +23,14 @@ public class CounselorServiceIMPL implements CounselorService {
     private final CounselorRepo counselorRepo;
     private final ModelMapper modelMapper;
     private final BranchRepo branchRepo;
+    private final StudentRepo studentRepo;
 
     @Autowired
-    public CounselorServiceIMPL(CounselorRepo counselorRepo, ModelMapper modelMapper, BranchRepo branchRepo) {
+    public CounselorServiceIMPL(CounselorRepo counselorRepo, ModelMapper modelMapper, BranchRepo branchRepo, StudentRepo studentRepo) {
         this.modelMapper = modelMapper;
         this.counselorRepo = counselorRepo;
         this.branchRepo = branchRepo;
+        this.studentRepo = studentRepo;
     }
 
     @Override
@@ -41,12 +45,14 @@ public class CounselorServiceIMPL implements CounselorService {
 
     @Override
     public String deleteCounselor(int counselorId) {
-        if(counselorRepo.existsById(counselorId)){
-            counselorRepo.deleteById(counselorId);
-            return "Counselor with ID"+counselorId+"has been Deleted";
-        }else{
-            throw new NotFoundException("Counselor Not Found");
+        Counselor counselor = counselorRepo.findById(counselorId).orElseThrow(() -> new NotFoundException("Counselor not found"));
+        boolean isReferenced = studentRepo.existsByCounselorId(counselor);
+        if (isReferenced) {
+            throw  new ForeignKeyConstraintViolationException("Cannot delete counselor as it is referenced by other records");
         }
+        counselorRepo.deleteById(counselorId);
+        return "Counselor with ID"+counselorId+"has been Deleted";
+
     }
 
     @Override

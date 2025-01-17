@@ -12,5 +12,7 @@ public interface ReceptionService {
 
     List<ReceptionDTO> getAllReception();
 
-    String updateReception(ReceptionDTO receptionDTO);
+    ReceptionDTO getReception(int id);
+
+    String updateReception(ReceptionSaveDTO receptionSaveDTO, int receptionId);
 }
