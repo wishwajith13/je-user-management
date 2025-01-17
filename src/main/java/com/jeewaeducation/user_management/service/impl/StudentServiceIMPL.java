@@ -1,11 +1,15 @@
 package com.jeewaeducation.user_management.service.impl;
 
 
+import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
+import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
 import com.jeewaeducation.user_management.dto.student.StudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
+import com.jeewaeducation.user_management.entity.Branch;
 import com.jeewaeducation.user_management.entity.Counselor;
 import com.jeewaeducation.user_management.entity.Student;
 import com.jeewaeducation.user_management.exception.NotFoundException;
+import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.StudentService;
@@ -15,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceIMPL implements StudentService {
@@ -26,28 +31,46 @@ public class StudentServiceIMPL implements StudentService {
     private ModelMapper modelMapper;
     @Autowired
     private StudentMapper studentMapper;
+    @Autowired
+    private BranchRepo branchRepo;
 
     @Override
-    public String saveStudent(StudentSaveDTO studentSaveDTO)    {
-
-        Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId()).orElseThrow(() -> new NotFoundException("Counselor not found"));
-
-        Student student = modelMapper.map(studentSaveDTO, Student.class);
-        student.setCounselorId(counselor);
-        student.setStudentId(0);
-        System.out.println(student);
-        studentRepo.save(student);
-        return "Student ID: " + student.getStudentId() + " Saved";
+    public String saveStudent(StudentSaveDTO studentSaveDTO) {
+        try {
+            Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId())
+                    .orElseThrow(() -> new NotFoundException("Counselor not found"));
+            Branch branch = branchRepo.findById(studentSaveDTO.getBranchId())
+                    .orElseThrow(() -> new NotFoundException("Branch not found"));
+//            Student student = modelMapper.map(studentSaveDTO, Student.class);
+            Student student = new Student();
+            student.setStudentRating(studentSaveDTO.getStudentRating());
+            student.setStudentStatus(studentSaveDTO.getStudentStatus());
+            student.setCounselorId(counselor);
+            student.setBranchId(branch);
+            student.setStudentId(0);
+            System.out.println(student);
+            studentRepo.save(student);
+            return "Student ID: " + student.getStudentId() + " Saved";
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error saving student: " + e.getMessage());
+        }
     }
 
     @Override
     public String updateStudent(StudentSaveDTO studentSaveDTO, int studentId) {
-        Student student = modelMapper.map(studentSaveDTO, Student.class);
+//        Student student = modelMapper.map(studentSaveDTO, Student.class);
         studentRepo.findById(studentId).orElseThrow(() -> new NotFoundException("Student not found"));
-        student.setStudentId(studentId);
         Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId())
                 .orElseThrow(() -> new NotFoundException("Counselor not found with ID: " + studentSaveDTO.getCounselorId()));
+        Branch branch = branchRepo.findById(studentSaveDTO.getBranchId())
+                .orElseThrow(() -> new NotFoundException("Branch not found with ID: " + studentSaveDTO.getBranchId()));
+        Student student = new Student();
+        student.setStudentId(studentId);
+        student.setStudentRating(studentSaveDTO.getStudentRating());
+        student.setStudentStatus(studentSaveDTO.getStudentStatus());
         student.setCounselorId(counselor);
+        student.setBranchId(branch);
         studentRepo.save(student);
         return student.getStudentId() + " Updated";
     }
@@ -65,12 +88,30 @@ public class StudentServiceIMPL implements StudentService {
         return modelMapper.map(student, StudentDTO.class);
     }
 
+//    @Override
+//    public List<StudentDTO> getAllStudents() {
+//        List<Student> students = studentRepo.findAll();
+//        if (students.isEmpty()) {
+//            throw new NotFoundException("No students found");
+//        }
+//        return studentMapper.entityListToDtoList(students);
+//    }
     @Override
     public List<StudentDTO> getAllStudents() {
         List<Student> students = studentRepo.findAll();
         if (students.isEmpty()) {
             throw new NotFoundException("No students found");
         }
-        return studentMapper.entityListToDtoList(students);
+        return students.stream().map(student -> {
+            StudentDTO studentDTO = modelMapper.map(student, StudentDTO.class);
+                // Ensure nested mapping is correct
+            if (student.getBranchId() != null) {
+                studentDTO.setBranchId(modelMapper.map(student.getBranchId(), BranchGetDTO.class));
+            }
+            if (student.getCounselorId() != null) {
+                studentDTO.setCounselorId(modelMapper.map(student.getCounselorId(), CounselorGetDTO.class));
+            }
+            return studentDTO;
+        }).collect(Collectors.toList());
     }
 }
