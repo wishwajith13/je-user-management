@@ -18,8 +18,11 @@ public class Student {
     private String studentRating;
     @Column(name = "student_status", nullable = false)
     private String studentStatus;
-    //counsillor id and branch id should be added
     @ManyToOne
     @JoinColumn(name = "counselor_id", referencedColumnName = "counselor_id")
     private Counselor counselorId;
+
+    @ManyToOne
+    @JoinColumn(name = "branch_id", referencedColumnName = "branch_id")
+    private Branch branchId;
 }

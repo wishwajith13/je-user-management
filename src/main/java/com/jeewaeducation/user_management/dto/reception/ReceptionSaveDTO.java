@@ -1,6 +1,5 @@
 package com.jeewaeducation.user_management.dto.reception;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,4 +12,5 @@ public class ReceptionSaveDTO {
     private String receptionAddress;
     private int receptionContact;
     private String receptionEmail;
+    private int branchId;
 }

@@ -42,11 +42,19 @@ public class ReceptionController {
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 
+    @GetMapping(
+            path = {"/get/{id}"}
+    )
+    public ResponseEntity<StandardResponse> getReception(@PathVariable int id) {
+        ReceptionDTO message = receptionService.getReception(id);
+        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
+    }
+
     @PutMapping(
             path = {"/update"}
     )
-    public ResponseEntity<StandardResponse> updateReception(@RequestBody ReceptionDTO receptionDTO) {
-        String message = receptionService.updateReception(receptionDTO);
+    public ResponseEntity<StandardResponse> updateReception(@RequestBody ReceptionSaveDTO receptionSaveDTO, int receptionId) {
+        String message = receptionService.updateReception(receptionSaveDTO, receptionId);
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 }
