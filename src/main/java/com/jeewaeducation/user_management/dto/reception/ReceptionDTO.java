@@ -14,4 +14,5 @@ public class ReceptionDTO {
     private String receptionAddress;
     private int receptionContact;
     private String receptionEmail;
+    //TODO:remove last 3
 }
