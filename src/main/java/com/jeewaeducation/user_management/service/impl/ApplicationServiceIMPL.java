@@ -70,7 +70,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
                 new NotFoundException("Reception not found with ID: " + applicationUpdateDTO.getReception()));
         application.setReception(reception);
         applicationRepo.findById(application.getApplicationId()).orElseThrow(() ->
-                new EntityNotFoundException("Application not found with ID: " + application.getApplicationId()));
+                new EntityNotFoundException("Application not found with ID: " + application.getApplicationId()));//TODO: exception handling
         applicationRepo.save(application);
         return application.getApplicationId() + "Updated";
     }
