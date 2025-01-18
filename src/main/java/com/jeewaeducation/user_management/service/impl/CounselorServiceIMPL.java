@@ -38,7 +38,7 @@ public class CounselorServiceIMPL implements CounselorService {
         Branch branch = branchRepo.findById(counselorSaveDTO.getBranch()).orElseThrow(() -> new NotFoundException("Branch not found"));
         Counselor counselor = modelMapper.map(counselorSaveDTO, Counselor.class);
         counselor.setBranch(branch);
-        counselor.setCounselorId(0); // Ensure counselorId is not set from DTO
+        counselor.setCounselorId(0);
         counselorRepo.save(counselor);
         return counselor.getCounselorId() + " Saved";
     }

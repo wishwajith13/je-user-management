@@ -36,12 +36,10 @@ public class StudentServiceIMPL implements StudentService {
 
     @Override
     public String saveStudent(StudentSaveDTO studentSaveDTO) {
-        try {
             Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId())
                     .orElseThrow(() -> new NotFoundException("Counselor not found"));
             Branch branch = branchRepo.findById(studentSaveDTO.getBranchId())
                     .orElseThrow(() -> new NotFoundException("Branch not found"));
-//            Student student = modelMapper.map(studentSaveDTO, Student.class);
             Student student = new Student();
             student.setStudentRating(studentSaveDTO.getStudentRating());
             student.setStudentStatus(studentSaveDTO.getStudentStatus());
@@ -51,15 +49,10 @@ public class StudentServiceIMPL implements StudentService {
             System.out.println(student);
             studentRepo.save(student);
             return "Student ID: " + student.getStudentId() + " Saved";
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error saving student: " + e.getMessage());
-        }
     }
 
     @Override
     public String updateStudent(StudentSaveDTO studentSaveDTO, int studentId) {
-//        Student student = modelMapper.map(studentSaveDTO, Student.class);
         studentRepo.findById(studentId).orElseThrow(() -> new NotFoundException("Student not found"));
         Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId())
                 .orElseThrow(() -> new NotFoundException("Counselor not found with ID: " + studentSaveDTO.getCounselorId()));
@@ -88,14 +81,6 @@ public class StudentServiceIMPL implements StudentService {
         return modelMapper.map(student, StudentDTO.class);
     }
 
-//    @Override
-//    public List<StudentDTO> getAllStudents() {
-//        List<Student> students = studentRepo.findAll();
-//        if (students.isEmpty()) {
-//            throw new NotFoundException("No students found");
-//        }
-//        return studentMapper.entityListToDtoList(students);
-//    }
     @Override
     public List<StudentDTO> getAllStudents() {
         List<Student> students = studentRepo.findAll();
@@ -104,7 +89,6 @@ public class StudentServiceIMPL implements StudentService {
         }
         return students.stream().map(student -> {
             StudentDTO studentDTO = modelMapper.map(student, StudentDTO.class);
-                // Ensure nested mapping is correct
             if (student.getBranchId() != null) {
                 studentDTO.setBranchId(modelMapper.map(student.getBranchId(), BranchGetDTO.class));
             }
