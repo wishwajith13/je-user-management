@@ -26,5 +26,8 @@ public class Reception {
     private String receptionEmail;
     @OneToMany(mappedBy = "reception")
     private List<Application> applications;
+    @ManyToOne
+    @JoinColumn(name = "branch", referencedColumnName = "branch_id")
+    private Branch branch;
     //branch_id is a foreign key
 }

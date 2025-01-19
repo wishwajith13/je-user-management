@@ -17,12 +17,16 @@ public class Counselor {
     @Column(name = "counselor_id")
     private int counselorId;
 
-    @Column(name = "branch_id")
-    private int branchId;
+    @ManyToOne
+    @JoinColumn(name = "branch_id", referencedColumnName = "branch_id")
+    private Branch branch;
 
-    @Column(name = "counselor_name")
+    @Column(name = "counselor_name", nullable = false)
     private String counselorName;
 
-    @Column(name = "counselor_email")
+    @Column(name = "counselor_phone_number", nullable = false)
     private String counselorPhoneNumber;
+
+    @Column(name = "counselor_email", nullable = false)
+    private String counselorEmail;
 }

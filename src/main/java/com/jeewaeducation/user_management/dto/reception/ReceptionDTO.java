@@ -1,9 +1,9 @@
 package com.jeewaeducation.user_management.dto.reception;
 
+import com.jeewaeducation.user_management.entity.Branch;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,5 +14,5 @@ public class ReceptionDTO {
     private String receptionAddress;
     private int receptionContact;
     private String receptionEmail;
-    //TODO:remove last 3
+    private Branch branch;
 }

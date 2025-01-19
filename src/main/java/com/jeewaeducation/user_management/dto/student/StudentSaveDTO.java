@@ -11,4 +11,5 @@ public class StudentSaveDTO {
     private String studentRating;
     private String studentStatus;
     private int counselorId;
+    private int branchId;
 }

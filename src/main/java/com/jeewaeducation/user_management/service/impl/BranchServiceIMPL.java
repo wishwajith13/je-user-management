@@ -4,8 +4,12 @@ package com.jeewaeducation.user_management.service.impl;
 import com.jeewaeducation.user_management.dto.branch.BranchDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchSaveDTO;
 import com.jeewaeducation.user_management.entity.Branch;
+import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.BranchRepo;
+import com.jeewaeducation.user_management.repo.CounselorRepo;
+import com.jeewaeducation.user_management.repo.ReceptionRepo;
+import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.BranchService;
 import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
 import org.modelmapper.ModelMapper;
@@ -25,6 +29,15 @@ public class BranchServiceIMPL implements BranchService {
 
     @Autowired
     private BranchMapper branchMapper;
+
+    @Autowired
+    private CounselorRepo counselorRepo;
+
+    @Autowired
+    private StudentRepo studentRepo;
+
+    @Autowired
+    private ReceptionRepo receptionRepo;
 
 
     @Override
@@ -46,7 +59,19 @@ public class BranchServiceIMPL implements BranchService {
 
     @Override
     public String deleteBranch(int id) {
-        branchRepo.findById(id).orElseThrow(() -> new NotFoundException("Branch not found"));
+        Branch branch = branchRepo.findById(id).orElseThrow(() -> new NotFoundException("Branch not found"));
+        boolean isReferencedByCounselor = counselorRepo.existsByBranch(branch);
+        boolean isReferencedByStudent = studentRepo.existsByBranchId(branch);
+        boolean isReferencedByReception = receptionRepo.existsByBranch(branch);
+        if(isReferencedByReception){
+            throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Reception");
+        }
+        if (isReferencedByCounselor) {
+            throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Counselor");
+        }
+        if (isReferencedByStudent) {
+            throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Student");
+        }
         branchRepo.deleteById(id);
         return "Branch " + id + " Deleted";
     }
