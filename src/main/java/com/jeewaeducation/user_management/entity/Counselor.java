@@ -24,6 +24,9 @@ public class Counselor {
     @Column(name = "counselor_name", nullable = false)
     private String counselorName;
 
-    @Column(name = "counselor_email", nullable = false)
+    @Column(name = "counselor_phone_number", nullable = false)
     private String counselorPhoneNumber;
+
+    @Column(name = "counselor_email", nullable = false)
+    private String counselorEmail;
 }
