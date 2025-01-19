@@ -11,4 +11,5 @@ public class CounselorSaveDTO {
     private int branch;
     private String counselorName;
     private String counselorPhoneNumber;
+    private String counselorEmail;
 }

@@ -20,18 +20,14 @@ import java.util.List;
 @Service
 public class CounselorServiceIMPL implements CounselorService {
 
-    private final CounselorRepo counselorRepo;
-    private final ModelMapper modelMapper;
-    private final BranchRepo branchRepo;
-    private final StudentRepo studentRepo;
-
     @Autowired
-    public CounselorServiceIMPL(CounselorRepo counselorRepo, ModelMapper modelMapper, BranchRepo branchRepo, StudentRepo studentRepo) {
-        this.modelMapper = modelMapper;
-        this.counselorRepo = counselorRepo;
-        this.branchRepo = branchRepo;
-        this.studentRepo = studentRepo;
-    }
+    private  CounselorRepo counselorRepo;
+    @Autowired
+    private  ModelMapper modelMapper;
+    @Autowired
+    private  BranchRepo branchRepo;
+    @Autowired
+    private  StudentRepo studentRepo;
 
     @Override
     public String saveCounselor(CounselorSaveDTO counselorSaveDTO) {
