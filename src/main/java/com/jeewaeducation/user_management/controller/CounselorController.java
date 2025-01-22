@@ -17,30 +17,30 @@ public class CounselorController {
     @Autowired
     private CounselorService counselorService;
 
-    @PostMapping("/save")
+    @PostMapping
     public ResponseEntity<StandardResponse> saveCounselor(@RequestBody CounselorSaveDTO counselorSaveDTO){
         String message = counselorService.saveCounselor(counselorSaveDTO);
-        return new ResponseEntity<StandardResponse>(new StandardResponse(201,"success",message), HttpStatus.CREATED);
+        return new ResponseEntity<>(new StandardResponse(201,"success",message), HttpStatus.CREATED);
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<StandardResponse> getCounselor(@PathVariable int id){
         CounselorGetDTO counselor = counselorService.getCounselor(id);
-        return new ResponseEntity<StandardResponse>(new StandardResponse(200,"success",counselor), HttpStatus.OK);
+        return new ResponseEntity<>(new StandardResponse(200,"success",counselor), HttpStatus.OK);
     }
 
-    @GetMapping("/getall")
+    @GetMapping
     public ResponseEntity<StandardResponse> getAllCounselors(){
-        return new ResponseEntity<StandardResponse>(new StandardResponse(200,"success",counselorService.getAllCounselors()), HttpStatus.OK);
+        return new ResponseEntity<>(new StandardResponse(200,"success",counselorService.getAllCounselors()), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<StandardResponse> deleteCounselor(@PathVariable int id){
         String message = counselorService.deleteCounselor(id);
-        return new ResponseEntity<StandardResponse>(new StandardResponse(200,"success",message), HttpStatus.OK);
+        return new ResponseEntity<>(new StandardResponse(200,"success",message), HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<StandardResponse> updateCounselor(@RequestBody CounselorSaveDTO counselorSaveDTO,@PathVariable int id){
         String message = counselorService.updateCounselor(counselorSaveDTO,id);
         return new ResponseEntity<>(new StandardResponse(201,"updated",message ),HttpStatus.ACCEPTED);
