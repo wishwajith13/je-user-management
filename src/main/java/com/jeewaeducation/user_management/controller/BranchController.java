@@ -21,36 +21,32 @@ public class BranchController {
     @Autowired
     private BranchService branchService;
 
-    @PostMapping(path = {"/save"})
+    @PostMapping
     public ResponseEntity<StandardResponse> saveBranch(@RequestBody BranchSaveDTO branchSaveDTO) {
         String message = branchService.saveBranch(branchSaveDTO);
-        return new ResponseEntity<StandardResponse>(new StandardResponse(201, "Success", message), HttpStatus.CREATED);
+        return new ResponseEntity<>(new StandardResponse(201, "Success", message), HttpStatus.CREATED);
     }
 
-    @PutMapping(path = {"/update"})
+    @PutMapping
     public ResponseEntity<StandardResponse> updateBranch(@RequestBody BranchDTO branchDTO) {
         String message = branchService.updateBranch(branchDTO);
-        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
+        return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = {"/delete/{id}"})
+    @DeleteMapping(path = {"/{id}"})
     public ResponseEntity<StandardResponse> deleteBranch(@PathVariable int id) {
         String message = branchService.deleteBranch(id);
-        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
+        return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 
-    @GetMapping(path = {"/getall"})
+    @GetMapping
     public ResponseEntity<StandardResponse> getAllBranch() {
         List<BranchDTO> message = branchService.getAllBranch();
-        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
+        return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 
-    @GetMapping(path = {"/get/{id}"})
+    @GetMapping(path = {"/{id}"})
     public ResponseEntity<StandardResponse> getBranch(@PathVariable int id) {
-        return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", branchService.getBranch(id)), HttpStatus.OK);
+        return new ResponseEntity<>(new StandardResponse(200, "Success", branchService.getBranch(id)), HttpStatus.OK);
     }
-
-
-
-
 }

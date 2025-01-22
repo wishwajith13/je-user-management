@@ -19,12 +19,9 @@ public class NavigationMenuController {
     @Autowired
     private NavigationMenuService navigationMenuService;
 
-    @GetMapping(
-            path = {"/get"}
-    )
+    @GetMapping
     public ResponseEntity<StandardResponse> getAllNavigationMenu() {
         List<NavigationMenuGetDTO> navigationMenuGetDTO = navigationMenuService.getAllNavigationMenu();
-        return new ResponseEntity<StandardResponse>(new StandardResponse(201, "Success", navigationMenuGetDTO), HttpStatus.OK);
+        return new ResponseEntity<>(new StandardResponse(201, "Success", navigationMenuGetDTO), HttpStatus.OK);
     }
-
 }
