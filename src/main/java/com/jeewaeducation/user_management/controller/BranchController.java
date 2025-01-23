@@ -50,7 +50,4 @@ public class BranchController {
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", branchService.getBranch(id)), HttpStatus.OK);
     }
 
-
-
-
 }

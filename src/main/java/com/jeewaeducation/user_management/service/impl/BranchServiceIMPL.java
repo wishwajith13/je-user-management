@@ -6,15 +6,14 @@ import com.jeewaeducation.user_management.dto.branch.BranchSaveDTO;
 import com.jeewaeducation.user_management.entity.Branch;
 import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
-import com.jeewaeducation.user_management.repo.BranchRepo;
-import com.jeewaeducation.user_management.repo.CounselorRepo;
-import com.jeewaeducation.user_management.repo.ReceptionRepo;
-import com.jeewaeducation.user_management.repo.StudentRepo;
+import com.jeewaeducation.user_management.repo.*;
 import com.jeewaeducation.user_management.service.BranchService;
 import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.jeewaeducation.user_management.entity.BranchManager;
 
 import java.util.List;
 
@@ -39,11 +38,19 @@ public class BranchServiceIMPL implements BranchService {
     @Autowired
     private ReceptionRepo receptionRepo;
 
+    @Autowired
+    private BranchManagerRepo branchManagerRepo;
 
     @Override
     public String saveBranch(BranchSaveDTO branchSaveDTO) {
         Branch branch = modelMapper.map(branchSaveDTO, Branch.class);
-        branch.setBranchID(0);//Ensure BranchID is not set from DTO
+        BranchManager branchManager = branchManagerRepo.findById(branchSaveDTO.getBranchManagerId()).orElseThrow(() ->
+                new NotFoundException("Branch Manager not found with ID: " + branchSaveDTO.getBranchManagerId()));
+        branch.setBranchManager(branchManager);
+        //branch.setBranchID(0);//Ensure BranchID is not set from DTO
+        branchRepo.findById(branch.getBranchID()).ifPresent(e -> {
+            throw new NotFoundException("Branch already exists");
+        });
         branchRepo.save(branch);
         return branch.getBranchID() + " Saved";
 
@@ -51,7 +58,11 @@ public class BranchServiceIMPL implements BranchService {
     @Override
     public String updateBranch(BranchDTO branchDTO) {
         Branch branch = modelMapper.map(branchDTO, Branch.class);
-        branchRepo.findById(branch.getBranchID()).orElseThrow(() -> new NotFoundException("Branch not found"));
+        BranchManager branchManager = branchManagerRepo.findById(branchDTO.getBranchManagerId()).orElseThrow(() ->
+                new NotFoundException("Branch Manager not found with ID: " + branchDTO.getBranchManagerId()));
+        branch.setBranchManager(branchManager);
+        branchRepo.findById(branch.getBranchID()).orElseThrow(() ->
+                new EntityNotFoundException("Branch not found with ID: " + branch.getBranchID()));
         branchRepo.save(branch);
         return branch.getBranchID() + " Updated";
 
@@ -63,6 +74,10 @@ public class BranchServiceIMPL implements BranchService {
         boolean isReferencedByCounselor = counselorRepo.existsByBranch(branch);
         boolean isReferencedByStudent = studentRepo.existsByBranchId(branch);
         boolean isReferencedByReception = receptionRepo.existsByBranch(branch);
+        boolean isReferencedByBranchManager = branchManagerRepo.existsByBranch(branch);
+        if(isReferencedByBranchManager){
+            throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Branch Manager");
+        }
         if(isReferencedByReception){
             throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Reception");
         }
@@ -90,7 +105,6 @@ public class BranchServiceIMPL implements BranchService {
         }
         return branchMapper.entityListToDtoList(branches);
     }
-
 
 
 }
