@@ -25,4 +25,8 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "branch_id", referencedColumnName = "branch_id")
     private Branch branchId;
+
+    @OneToOne
+    @JoinColumn(name = "application_id", referencedColumnName = "application_id")
+    private Application application;
 }

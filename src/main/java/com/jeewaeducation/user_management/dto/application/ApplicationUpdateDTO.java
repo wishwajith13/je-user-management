@@ -49,4 +49,5 @@ public class ApplicationUpdateDTO {
     private String preferredCity;
     private String methodeOfKnowing;
     private int reception;
+    private int Student;
 }

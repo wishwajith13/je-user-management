@@ -89,9 +89,19 @@ public class Application {
     private String preferredCity;
     @Column(name = "methode_of_Knowing",nullable = false)
     private String methodeOfKnowing;
+
     @ManyToOne
     @JoinColumn(name = "reception_id")
     private Reception reception;
-    
+
+    @OneToOne(mappedBy = "application_id")
+    private Student student;
+
+
+
+
+
+
+
     //validate name and student id have to add
 }
