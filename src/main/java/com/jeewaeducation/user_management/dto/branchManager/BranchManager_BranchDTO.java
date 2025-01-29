@@ -1,17 +1,11 @@
 package com.jeewaeducation.user_management.dto.branchManager;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.jeewaeducation.user_management.entity.Branch;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-
-public class BranchManagerDTO {
+public class BranchManager_BranchDTO {
     private int branchManagerId;
     private String branchManagerName;
     private int branchManagerContactNumber;
     private String branchManagerEmail;
-    private int BranchID;
+    private Branch BranchID;
 }

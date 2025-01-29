@@ -3,7 +3,9 @@ package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.branch.BranchDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchSaveDTO;
+import com.jeewaeducation.user_management.dto.branch.Branch_BranchManagerDTO;
 import com.jeewaeducation.user_management.entity.Branch;
+import com.jeewaeducation.user_management.exception.BranchManagerAlreadyAssignedException;
 import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.*;
@@ -11,6 +13,7 @@ import com.jeewaeducation.user_management.service.BranchService;
 import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.jeewaeducation.user_management.entity.BranchManager;
@@ -46,25 +49,26 @@ public class BranchServiceIMPL implements BranchService {
         Branch branch = modelMapper.map(branchSaveDTO, Branch.class);
         BranchManager branchManager = branchManagerRepo.findById(branchSaveDTO.getBranchManagerId()).orElseThrow(() ->
                 new NotFoundException("Branch Manager not found with ID: " + branchSaveDTO.getBranchManagerId()));
-        branch.setBranchManager(branchManager);
-        //branch.setBranchID(0);//Ensure BranchID is not set from DTO
-        branchRepo.findById(branch.getBranchID()).ifPresent(e -> {
-            throw new NotFoundException("Branch already exists");
-        });
-        branchRepo.save(branch);
-        return branch.getBranchID() + " Saved";
 
+        if (branchManager.getBranch() != null) {
+            throw new BranchManagerAlreadyAssignedException("Branch Manager is already assigned to another branch");
+        }
+        branch.setBranchManager(branchManager);
+        branch.setBranchId(0); // Ensure BranchID is not set from DTO
+        branchRepo.save(branch);
+        return branch.getBranchId() + " Saved";
     }
+
     @Override
     public String updateBranch(BranchDTO branchDTO) {
         Branch branch = modelMapper.map(branchDTO, Branch.class);
         BranchManager branchManager = branchManagerRepo.findById(branchDTO.getBranchManagerId()).orElseThrow(() ->
                 new NotFoundException("Branch Manager not found with ID: " + branchDTO.getBranchManagerId()));
         branch.setBranchManager(branchManager);
-        branchRepo.findById(branch.getBranchID()).orElseThrow(() ->
-                new EntityNotFoundException("Branch not found with ID: " + branch.getBranchID()));
+        branchRepo.findById(branch.getBranchId()).orElseThrow(() ->
+                new EntityNotFoundException("Branch not found with ID: " + branch.getBranchId()));
         branchRepo.save(branch);
-        return branch.getBranchID() + " Updated";
+        return branch.getBranchId() + " Updated";
 
     }
 
@@ -92,18 +96,19 @@ public class BranchServiceIMPL implements BranchService {
     }
 
     @Override
-    public BranchDTO getBranch(int id) {
+    public Branch_BranchManagerDTO getBranch(int id) throws Exception {
         Branch branch = branchRepo.findById(id).orElseThrow(() -> new NotFoundException("Branch not found"));
-        return modelMapper.map(branch, BranchDTO.class);
+        return  modelMapper.map(branch, Branch_BranchManagerDTO.class);
+//        return modelMapper.map(branch, BranchDTO.class);
     }
 
     @Override
-    public List<BranchDTO> getAllBranch() {
+    public List<Branch_BranchManagerDTO> getAllBranch() {
         List<Branch> branches = branchRepo.findAll();
         if (branches.isEmpty()) {
             throw new NotFoundException("No branches found");
         }
-        return branchMapper.entityListToDtoList(branches);
+        return modelMapper.map(branches,new TypeToken<List<Branch_BranchManagerDTO>>() {}.getType());
     }
 
 

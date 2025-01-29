@@ -26,4 +26,11 @@ public class Branch {
     @JoinColumn(name = "branch_manager_id", referencedColumnName = "branch_manager_id")
     private BranchManager branchManager;
     //add to branchManagerId
+    public int getBranchId() {
+        return BranchID;
+    }
+
+    public void setBranchId(int BranchId) {
+        this.BranchID = BranchId;
+    }
 }

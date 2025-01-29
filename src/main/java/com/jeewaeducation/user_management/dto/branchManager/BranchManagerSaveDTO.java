@@ -12,4 +12,5 @@ public class BranchManagerSaveDTO {
     private String branchManagerName;
     private int branchManagerContactNumber;
     private String branchManagerEmail;
+    private int branch;
 }
