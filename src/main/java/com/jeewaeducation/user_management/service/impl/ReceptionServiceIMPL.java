@@ -11,6 +11,7 @@ import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.repo.ReceptionRepo;
 import com.jeewaeducation.user_management.service.ReceptionService;
 import com.jeewaeducation.user_management.utility.mappers.ReceptionMapper;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,17 +19,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReceptionServiceIMPL implements ReceptionService {
-    @Autowired
-    private ReceptionRepo receptionRepo;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private ReceptionMapper receptionMapper;
-    @Autowired
-    private BranchRepo branchRepo;
-    @Autowired
-    private ApplicationRepo applicationRepo;
+    private final ReceptionRepo receptionRepo;
+    private final ModelMapper modelMapper;
+    private final ReceptionMapper receptionMapper;
+    private final BranchRepo branchRepo;
+    private final ApplicationRepo applicationRepo;
 
     @Override
     public String saveReception(ReceptionSaveDTO receptionSaveDTO) {
