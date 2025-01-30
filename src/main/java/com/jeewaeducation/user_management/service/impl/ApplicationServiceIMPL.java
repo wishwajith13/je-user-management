@@ -5,7 +5,6 @@ import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationStudentBasicDetailsGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionDTO;
-import com.jeewaeducation.user_management.dto.student.StudentBasicDetailsGetDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Reception;
 import com.jeewaeducation.user_management.exception.DuplicateKeyException;
@@ -14,24 +13,20 @@ import com.jeewaeducation.user_management.repo.ApplicationRepo;
 import com.jeewaeducation.user_management.repo.ReceptionRepo;
 import com.jeewaeducation.user_management.service.ApplicationService;
 import com.jeewaeducation.user_management.utility.mappers.ApplicationMapper;
-import com.jeewaeducation.user_management.utility.mappers.ReceptionMapper;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ApplicationServiceIMPL implements ApplicationService {
-    @Autowired
-    private ApplicationRepo applicationRepo;
-    @Autowired
-    private ReceptionRepo receptionRepo;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private ApplicationMapper applicationMapper;
+    private final ApplicationRepo applicationRepo;
+    private final ReceptionRepo receptionRepo;
+    private final ModelMapper modelMapper;
+    private final ApplicationMapper applicationMapper;
 
     @Override
     public String saveApplication(ApplicationSaveDTO applicationSaveDTO) {
