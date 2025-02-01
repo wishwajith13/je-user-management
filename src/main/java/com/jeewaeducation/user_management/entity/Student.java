@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Student {
+public class Student extends BaseEntity {
     @Id
     @Column(name = "student_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)

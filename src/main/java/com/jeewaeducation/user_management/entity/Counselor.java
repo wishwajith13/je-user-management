@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "counselor")
 @Data
-public class Counselor {
+public class Counselor extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

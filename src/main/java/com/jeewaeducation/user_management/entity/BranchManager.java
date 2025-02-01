@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class BranchManager {
+public class BranchManager extends BaseEntity {
     @Id
     @Column(name = "branch_manager_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)

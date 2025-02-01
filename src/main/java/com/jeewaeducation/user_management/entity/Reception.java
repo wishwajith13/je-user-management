@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Reception {
+public class Reception extends BaseEntity{
     @Id
     @Column(name = "reception_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)

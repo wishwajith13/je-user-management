@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class AdmissionManager {
+public class AdmissionManager extends BaseEntity {
     @Id
     @Column(name = "admission_manager_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)

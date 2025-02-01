@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Branch {
+public class Branch extends BaseEntity {
 
     @Id
     @Column(name = "branch_id", nullable = false)
