@@ -94,7 +94,7 @@ public class Application {
     @JoinColumn(name = "reception_id")
     private Reception reception;
 
-    @OneToOne(mappedBy = "application_id")
+    @OneToOne(mappedBy = "application")
     private Student student;
 
 
