@@ -50,5 +50,4 @@ public class ApplicationGetDTO {
     private String preferredCity;
     private String methodeOfKnowing;
     private ReceptionDTO reception;
-//    private StudentDTO student;
 }
