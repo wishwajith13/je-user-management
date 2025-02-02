@@ -2,6 +2,7 @@ package com.jeewaeducation.user_management.controller;
 
 import com.jeewaeducation.user_management.dto.student.StudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
+import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
 import com.jeewaeducation.user_management.service.StudentService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,8 @@ public class StudentController {
     @PutMapping(
             path = {"/update/{id}"}
     )
-    public ResponseEntity<StandardResponse> updateStudent(@RequestBody StudentSaveDTO studentSaveDTO, @PathVariable int id) {
-        String message = studentService.updateStudent(studentSaveDTO, id);
+    public ResponseEntity<StandardResponse> updateStudent(@RequestBody StudentUpdateDTO studentUpdateDTO, @PathVariable int id) {
+        String message = studentService.updateStudent(studentUpdateDTO, id);
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 

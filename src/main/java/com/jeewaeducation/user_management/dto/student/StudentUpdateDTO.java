@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-public class StudentSaveDTO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class StudentUpdateDTO {
     private String studentRating;
     private String studentStatus;
     private int counselorId;
     private int branchId;
-    private int applicationId;
 }

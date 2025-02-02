@@ -1,6 +1,6 @@
 package com.jeewaeducation.user_management.dto.student;
 
-import com.jeewaeducation.user_management.dto.application.ApplicationStudentGetDTO;
+import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
 import lombok.AllArgsConstructor;
@@ -16,5 +16,5 @@ public class StudentDTO {
     private String studentStatus;
     private CounselorGetDTO counselorId;
     private BranchGetDTO branchId;
-    private ApplicationStudentGetDTO applicationId;
+    private ApplicationGetDTO applicationId;
 }

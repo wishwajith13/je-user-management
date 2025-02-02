@@ -21,6 +21,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
     @Autowired
     private StudentService studentService;
 
-        @Override
+        @Transactional
         public String saveApplication(ApplicationSaveDTO applicationSaveDTO) {
             Application application = modelMapper.map(applicationSaveDTO, Application.class);
 
@@ -61,9 +62,9 @@ public class ApplicationServiceIMPL implements ApplicationService {
             student.setBranchId(reception.getBranch()); // Assign branch from reception
             student.setApplication(application); // Link Student to Application
 
-            student = studentRepo.save(student);
+            studentRepo.save(student);
 
-            application.setStudent(student);
+            //application.setStudent(savedStudent);
 
             Application savedApplication = applicationRepo.save(application);
 
@@ -91,6 +92,8 @@ public class ApplicationServiceIMPL implements ApplicationService {
     @Override
     public String updateApplication(ApplicationUpdateDTO applicationUpdateDTO) { //Not given to update reception details for company security reason
         Application application = modelMapper.map(applicationUpdateDTO, Application.class);
+        applicationRepo.findById(application.getApplicationId()).orElseThrow(() ->
+                new NotFoundException("Application not found with ID: " + application.getApplicationId()));
         Reception reception = receptionRepo.findById((applicationUpdateDTO.getReception())).orElseThrow(() ->
                 new NotFoundException("Reception not found with ID: " + applicationUpdateDTO.getReception()));
         application.setReception(reception);
