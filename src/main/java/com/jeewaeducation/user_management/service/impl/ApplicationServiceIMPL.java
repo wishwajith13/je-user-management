@@ -18,29 +18,21 @@ import com.jeewaeducation.user_management.service.ApplicationService;
 import com.jeewaeducation.user_management.service.StudentService;
 import com.jeewaeducation.user_management.utility.mappers.ApplicationMapper;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ApplicationServiceIMPL implements ApplicationService {
-    @Autowired
-    private ApplicationRepo applicationRepo;
-    @Autowired
-    private ReceptionRepo receptionRepo;
-    @Autowired
-    private CounselorRepo counselorRepo;
-    @Autowired
-    private StudentRepo studentRepo;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private ApplicationMapper applicationMapper;
-    @Autowired
-    private StudentService studentService;
+    private final ApplicationRepo applicationRepo;
+    private final ReceptionRepo receptionRepo;
+    private final ModelMapper modelMapper;
+    private final ApplicationMapper applicationMapper;
+    private final StudentRepo studentRepo;
 
         @Transactional
         public String saveApplication(ApplicationSaveDTO applicationSaveDTO) {

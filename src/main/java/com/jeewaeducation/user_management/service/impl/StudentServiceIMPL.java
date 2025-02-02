@@ -16,9 +16,8 @@ import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.StudentService;
-import com.jeewaeducation.user_management.utility.mappers.StudentMapper;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,19 +25,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class StudentServiceIMPL implements StudentService {
-    @Autowired
-    private StudentRepo studentRepo;
-    @Autowired
-    private CounselorRepo counselorRepo;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private StudentMapper studentMapper;
-    @Autowired
-    private BranchRepo branchRepo;
-    @Autowired
-    private ApplicationRepo applicationRepo;
+    private final StudentRepo studentRepo;
+    private final CounselorRepo counselorRepo;
+    private final ModelMapper modelMapper;
+    private final BranchRepo branchRepo;
+    private final ApplicationRepo applicationRepo;
 
     @Transactional
         public String saveStudent(StudentSaveDTO studentSaveDTO) {
