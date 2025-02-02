@@ -1,6 +1,5 @@
 package com.jeewaeducation.user_management.dto.application;
 
-import com.jeewaeducation.user_management.entity.Reception;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -48,5 +47,4 @@ public class ApplicationSaveDTO {
     private String preferredCity;
     private String methodeOfKnowing;
     private int reception;
-    private int Student_id;
 }

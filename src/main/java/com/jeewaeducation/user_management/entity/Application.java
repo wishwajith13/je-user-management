@@ -94,7 +94,7 @@ public class Application {
     @JoinColumn(name = "reception_id")
     private Reception reception;
 
-    @OneToOne(mappedBy = "application")
+    @OneToOne(mappedBy = "application", cascade = CascadeType.ALL)
     private Student student;
 
 

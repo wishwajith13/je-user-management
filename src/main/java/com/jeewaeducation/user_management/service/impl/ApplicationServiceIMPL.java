@@ -5,22 +5,22 @@ import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationStudentBasicDetailsGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionDTO;
-import com.jeewaeducation.user_management.dto.student.StudentBasicDetailsGetDTO;
-import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Reception;
+import com.jeewaeducation.user_management.entity.Student;
 import com.jeewaeducation.user_management.exception.DuplicateKeyException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.ApplicationRepo;
+import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.ReceptionRepo;
+import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.ApplicationService;
+import com.jeewaeducation.user_management.service.StudentService;
 import com.jeewaeducation.user_management.utility.mappers.ApplicationMapper;
-import com.jeewaeducation.user_management.utility.mappers.ReceptionMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -31,30 +31,44 @@ public class ApplicationServiceIMPL implements ApplicationService {
     @Autowired
     private ReceptionRepo receptionRepo;
     @Autowired
+    private CounselorRepo counselorRepo;
+    @Autowired
+    private StudentRepo studentRepo;
+    @Autowired
     private ModelMapper modelMapper;
     @Autowired
     private ApplicationMapper applicationMapper;
+    @Autowired
+    private StudentService studentService;
 
-    @Override
-    public String saveApplication(ApplicationSaveDTO applicationSaveDTO) {
+        @Override
+        public String saveApplication(ApplicationSaveDTO applicationSaveDTO) {
+            Application application = modelMapper.map(applicationSaveDTO, Application.class);
 
-        Application application = modelMapper.map(applicationSaveDTO, Application.class);
-        Reception reception = receptionRepo.findById(applicationSaveDTO.getReception()).orElseThrow(() -> new NotFoundException("Reception not found with ID: " + applicationSaveDTO.getReception()));
-        application.setReception(reception);
-        applicationRepo.findById(application.getApplicationId()).ifPresent(e -> {
-            throw new DuplicateKeyException("Reception already exists");
-        });
-        applicationRepo.save(application);
-        StudentSaveDTO studentSaveDTO = new StudentSaveDTO();
-        studentSaveDTO.setStudentRating("NA");
-        studentSaveDTO.setStudentStatus("NA");
-        studentSaveDTO.setBranchId(application.getReception().getBranch().getBranchID());
-        studentSaveDTO.setApplicationId(application);
-//        studentSaveDTO.setCounselorId();
-        StudentServiceIMPL studentServiceIMPL = new StudentServiceIMPL();
-        studentServiceIMPL.saveStudent(studentSaveDTO);
-        return application.getApplicationId() + " Saved";
-    }
+            Reception reception = receptionRepo.findById(applicationSaveDTO.getReception())
+                    .orElseThrow(() -> new NotFoundException("Reception not found with ID: " + applicationSaveDTO.getReception()));
+            application.setReception(reception);
+
+            if (applicationRepo.existsById(application.getApplicationId())) {
+                throw new DuplicateKeyException("Application already exists with ID: " + application.getApplicationId());
+            }
+
+            Student student = new Student();
+            student.setStudentRating("NA");
+            student.setStudentStatus("NA");
+//            student.setCounselorId(counselorRepo.findById(603)
+//                    .orElseThrow(() -> new NotFoundException("Counselor not found")));
+            student.setBranchId(reception.getBranch()); // Assign branch from reception
+            student.setApplication(application); // Link Student to Application
+
+            student = studentRepo.save(student);
+
+            application.setStudent(student);
+
+            Application savedApplication = applicationRepo.save(application);
+
+            return "Application ID: " + savedApplication.getApplicationId() + " and Student ID: " + student.getStudentId() + " Saved";
+        }
 
     @Override
     public String deleteApplication(int applicationId) {

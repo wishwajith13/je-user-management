@@ -26,7 +26,7 @@ public class Student {
     @JoinColumn(name = "branch_id", referencedColumnName = "branch_id")
     private Branch branchId;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "application_id", referencedColumnName = "application_id")
     private Application application;
 }

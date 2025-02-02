@@ -5,10 +5,12 @@ import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
 import com.jeewaeducation.user_management.dto.student.StudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
+import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Branch;
 import com.jeewaeducation.user_management.entity.Counselor;
 import com.jeewaeducation.user_management.entity.Student;
 import com.jeewaeducation.user_management.exception.NotFoundException;
+import com.jeewaeducation.user_management.repo.ApplicationRepo;
 import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
@@ -33,6 +35,8 @@ public class StudentServiceIMPL implements StudentService {
     private StudentMapper studentMapper;
     @Autowired
     private BranchRepo branchRepo;
+    @Autowired
+    private ApplicationRepo applicationRepo;
 
     @Override
     public String saveStudent(StudentSaveDTO studentSaveDTO) {
@@ -40,12 +44,15 @@ public class StudentServiceIMPL implements StudentService {
                     .orElseThrow(() -> new NotFoundException("Counselor not found"));
             Branch branch = branchRepo.findById(studentSaveDTO.getBranchId())
                     .orElseThrow(() -> new NotFoundException("Branch not found"));
+            Application application = applicationRepo.findById(studentSaveDTO.getApplicationId().getApplicationId())
+                    .orElseThrow(() -> new NotFoundException("Application not found"));
             Student student = new Student();
             student.setStudentRating(studentSaveDTO.getStudentRating());
             student.setStudentStatus(studentSaveDTO.getStudentStatus());
             student.setCounselorId(counselor);
             student.setBranchId(branch);
             student.setStudentId(0);
+            student.setApplication(application);
             System.out.println(student);
             studentRepo.save(student);
             return "Student ID: " + student.getStudentId() + " Saved";
