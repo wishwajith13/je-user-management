@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class BranchSaveDTO {
 
     private String branchName;
-    private int branchManagerId;
+    //private int branchManagerId;
 
 }

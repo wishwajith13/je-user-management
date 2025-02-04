@@ -1,6 +1,7 @@
 package com.jeewaeducation.user_management.controller;
 
 import com.jeewaeducation.user_management.dto.branchManager.BranchManagerDTO;
+import com.jeewaeducation.user_management.dto.branchManager.BranchManagerGetDTO;
 import com.jeewaeducation.user_management.dto.branchManager.BranchManagerSaveDTO;
 import com.jeewaeducation.user_management.service.BranchManagerService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
@@ -40,7 +41,7 @@ public class BranchManagerController {
             path = {"/getall"}
     )
     public ResponseEntity<StandardResponse> getAllBranchManager() {
-        List<BranchManagerDTO> message = branchManagerService.getAllBranchManager();
+        List<BranchManagerGetDTO> message = branchManagerService.getAllBranchManager();
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 
@@ -54,7 +55,7 @@ public class BranchManagerController {
             path = {"/get/{id}"}
     )
     public ResponseEntity<StandardResponse> getBranchManagerById(@PathVariable int id) {
-        BranchManagerDTO message = branchManagerService.getBranchManagerById(id);
+        BranchManagerGetDTO message = branchManagerService.getBranchManagerById(id);
         return new ResponseEntity<StandardResponse>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 

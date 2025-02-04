@@ -1,5 +1,6 @@
 package com.jeewaeducation.user_management.dto.branchManager;
 
+import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,10 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BranchManager_BranchDTO {
+public class BranchManagerGetDTO {
     private int branchManagerId;
     private String branchManagerName;
     private int branchManagerContactNumber;
     private String branchManagerEmail;
- //   private Branch BranchID;
+    private BranchGetDTO BranchID;
 }

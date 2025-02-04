@@ -16,6 +16,13 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(AlreadyAssignedException.class)
+    public ResponseEntity<StandardResponse> handleAlreadyAssignedException(AlreadyAssignedException exception) {
+        return new ResponseEntity<StandardResponse>(
+                new StandardResponse(408, "Conflict", exception.getMessage()), HttpStatus.CONFLICT
+        );
+    }
+
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<StandardResponse> handleDuplicateKeyException(DuplicateKeyException exception) {
         return new ResponseEntity<StandardResponse>(

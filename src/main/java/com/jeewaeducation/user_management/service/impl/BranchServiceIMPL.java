@@ -4,20 +4,20 @@ package com.jeewaeducation.user_management.service.impl;
 import com.jeewaeducation.user_management.dto.branch.BranchDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchSaveDTO;
 import com.jeewaeducation.user_management.dto.branch.Branch_BranchManagerDTO;
+import com.jeewaeducation.user_management.dto.branchManager.BranchManager_BranchDTO;
 import com.jeewaeducation.user_management.entity.Branch;
-import com.jeewaeducation.user_management.exception.BranchManagerAlreadyAssignedException;
+import com.jeewaeducation.user_management.exception.AlreadyAssignedException;
 import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.*;
 import com.jeewaeducation.user_management.service.BranchService;
 import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
-import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.jeewaeducation.user_management.entity.BranchManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,13 +47,13 @@ public class BranchServiceIMPL implements BranchService {
     @Override
     public String saveBranch(BranchSaveDTO branchSaveDTO) {
         Branch branch = modelMapper.map(branchSaveDTO, Branch.class);
-        BranchManager branchManager = branchManagerRepo.findById(branchSaveDTO.getBranchManagerId()).orElseThrow(() ->
+/*       BranchManager branchManager = branchManagerRepo.findById(branchSaveDTO.getBranchManagerId()).orElseThrow(() ->
                 new NotFoundException("Branch Manager not found with ID: " + branchSaveDTO.getBranchManagerId()));
 
-        if (branchManager.getBranch() != null) {
-            throw new BranchManagerAlreadyAssignedException("Branch Manager is already assigned to another branch");
+      if (branchManager.getBranch() != null) {
+            throw new AlreadyAssignedException("Branch Manager is already assigned to another branch");
         }
-        branch.setBranchManager(branchManager);
+        branch.setBranchManager(branchManager);*/
         branch.setBranchId(0); // Ensure BranchID is not set from DTO
         branchRepo.save(branch);
         return branch.getBranchId() + " Saved";
@@ -61,15 +61,24 @@ public class BranchServiceIMPL implements BranchService {
 
     @Override
     public String updateBranch(BranchDTO branchDTO) {
-        Branch branch = modelMapper.map(branchDTO, Branch.class);
+        Branch branch = branchRepo.findById(branchDTO.getBranchID()).orElseThrow(() ->
+                new NotFoundException("Branch not found with ID: " + branchDTO.getBranchID()));
+
         BranchManager branchManager = branchManagerRepo.findById(branchDTO.getBranchManagerId()).orElseThrow(() ->
                 new NotFoundException("Branch Manager not found with ID: " + branchDTO.getBranchManagerId()));
-        branch.setBranchManager(branchManager);
-        branchRepo.findById(branch.getBranchId()).orElseThrow(() ->
-                new EntityNotFoundException("Branch not found with ID: " + branch.getBranchId()));
-        branchRepo.save(branch);
-        return branch.getBranchId() + " Updated";
 
+        if (branchManager.getBranch() != null && branchManager.getBranch().getBranchId() != branch.getBranchId()) {
+            throw new AlreadyAssignedException("Branch Manager is already assigned to another branch");
+        }
+
+        branch.setBranchName(branchDTO.getBranchName());
+        branch.setBranchManager(branchManager);
+        branchManager.setBranch(branch);
+
+        branchRepo.save(branch);
+        branchManagerRepo.save(branchManager);
+
+        return branch.getBranchId() + " Updated";
     }
 
     @Override
@@ -96,10 +105,17 @@ public class BranchServiceIMPL implements BranchService {
     }
 
     @Override
-    public Branch_BranchManagerDTO getBranch(int id) throws Exception {
+    public Branch_BranchManagerDTO getBranch(int id) {
         Branch branch = branchRepo.findById(id).orElseThrow(() -> new NotFoundException("Branch not found"));
-        return  modelMapper.map(branch, Branch_BranchManagerDTO.class);
-//        return modelMapper.map(branch, BranchDTO.class);
+
+        Branch_BranchManagerDTO branchDTO = new Branch_BranchManagerDTO();
+        branchDTO.setBranchID(branch.getBranchId());
+        branchDTO.setBranchName(branch.getBranchName());
+
+        BranchManager_BranchDTO branchManagerDTO = getBranchManagerBranchDTO(branch);
+        branchDTO.setBranchManagerId(branchManagerDTO);
+
+        return branchDTO;
     }
 
     @Override
@@ -108,8 +124,31 @@ public class BranchServiceIMPL implements BranchService {
         if (branches.isEmpty()) {
             throw new NotFoundException("No branches found");
         }
-        return modelMapper.map(branches,new TypeToken<List<Branch_BranchManagerDTO>>() {}.getType());
+
+        List<Branch_BranchManagerDTO> branchDTOs = new ArrayList<>();
+        for (Branch branch : branches) {
+            Branch_BranchManagerDTO branchDTO = new Branch_BranchManagerDTO();
+            branchDTO.setBranchID(branch.getBranchId());
+            branchDTO.setBranchName(branch.getBranchName());
+
+            BranchManager_BranchDTO branchManagerDTO = getBranchManagerBranchDTO(branch);
+            branchDTO.setBranchManagerId(branchManagerDTO);
+
+            branchDTOs.add(branchDTO);
+        }
+        return branchDTOs;
     }
 
+    private static BranchManager_BranchDTO getBranchManagerBranchDTO(Branch branch) {
+        BranchManager_BranchDTO branchManagerDTO = new BranchManager_BranchDTO();
+        BranchManager branchManager = branch.getBranchManager();
+        if (branchManager != null) {
+            branchManagerDTO.setBranchManagerId(branchManager.getBranchManagerId());
+            branchManagerDTO.setBranchManagerName(branchManager.getBranchManagerName());
+            branchManagerDTO.setBranchManagerContactNumber(branchManager.getBranchManagerContactNumber());
+            branchManagerDTO.setBranchManagerEmail(branchManager.getBranchManagerEmail());
+        }
+        return branchManagerDTO;
+    }
 
 }
