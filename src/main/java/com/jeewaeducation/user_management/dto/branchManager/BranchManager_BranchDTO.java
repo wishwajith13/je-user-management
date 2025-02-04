@@ -12,5 +12,4 @@ public class BranchManager_BranchDTO {
     private String branchManagerName;
     private int branchManagerContactNumber;
     private String branchManagerEmail;
- //   private Branch BranchID;
 }

@@ -6,6 +6,7 @@ import com.jeewaeducation.user_management.dto.branch.BranchSaveDTO;
 import com.jeewaeducation.user_management.dto.branch.Branch_BranchManagerDTO;
 import com.jeewaeducation.user_management.dto.branchManager.BranchManager_BranchDTO;
 import com.jeewaeducation.user_management.entity.Branch;
+import com.jeewaeducation.user_management.entity.BranchManager;
 import com.jeewaeducation.user_management.exception.AlreadyAssignedException;
 import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
@@ -15,7 +16,6 @@ import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.jeewaeducation.user_management.entity.BranchManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,13 +47,7 @@ public class BranchServiceIMPL implements BranchService {
     @Override
     public String saveBranch(BranchSaveDTO branchSaveDTO) {
         Branch branch = modelMapper.map(branchSaveDTO, Branch.class);
-/*       BranchManager branchManager = branchManagerRepo.findById(branchSaveDTO.getBranchManagerId()).orElseThrow(() ->
-                new NotFoundException("Branch Manager not found with ID: " + branchSaveDTO.getBranchManagerId()));
 
-      if (branchManager.getBranch() != null) {
-            throw new AlreadyAssignedException("Branch Manager is already assigned to another branch");
-        }
-        branch.setBranchManager(branchManager);*/
         branch.setBranchId(0); // Ensure BranchID is not set from DTO
         branchRepo.save(branch);
         return branch.getBranchId() + " Saved";
@@ -88,10 +82,10 @@ public class BranchServiceIMPL implements BranchService {
         boolean isReferencedByStudent = studentRepo.existsByBranchId(branch);
         boolean isReferencedByReception = receptionRepo.existsByBranch(branch);
         boolean isReferencedByBranchManager = branchManagerRepo.existsByBranch(branch);
-        if(isReferencedByBranchManager){
+        if (isReferencedByBranchManager) {
             throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Branch Manager");
         }
-        if(isReferencedByReception){
+        if (isReferencedByReception) {
             throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Reception");
         }
         if (isReferencedByCounselor) {
@@ -150,5 +144,6 @@ public class BranchServiceIMPL implements BranchService {
         }
         return branchManagerDTO;
     }
+
 
 }

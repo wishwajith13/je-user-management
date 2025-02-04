@@ -14,10 +14,10 @@ import com.jeewaeducation.user_management.repo.BranchManagerRepo;
 import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.service.BranchManagerService;
 import com.jeewaeducation.user_management.service.BranchService;
+import com.jeewaeducation.user_management.utility.mappers.BranchManagerMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.jeewaeducation.user_management.utility.mappers.BranchManagerMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -84,14 +84,6 @@ public class BranchManagerServiceIMPL implements BranchManagerService {
         return branchManagerDTOs;
     }
 
-   /* @Override
-    public String updateBranchManager(BranchManagerDTO branchManagerDTO) {
-        BranchManager branchManager = modelMapper.map(branchManagerDTO, BranchManager.class);
-        branchManagerRepo.findById(branchManager.getBranchManagerId()).orElseThrow(() -> new NotFoundException("Branch Manager not found"));
-        branchManagerRepo.save(branchManager);
-        return branchManager.getBranchManagerId() + " Updated";
-    }*/
-
     @Override
     public BranchManagerGetDTO getBranchManagerById(int id) {
         BranchManager branchManager = branchManagerRepo.findById(id)
@@ -145,8 +137,6 @@ public class BranchManagerServiceIMPL implements BranchManagerService {
         return branchManager.getBranchManagerId() + " Updated";
     }
 
-
-
     private BranchManagerGetDTO mapToBranchManagerGetDTO(BranchManager branchManager) {
         BranchManagerGetDTO branchManagerDTO = new BranchManagerGetDTO();
         branchManagerDTO.setBranchManagerId(branchManager.getBranchManagerId());
@@ -163,5 +153,4 @@ public class BranchManagerServiceIMPL implements BranchManagerService {
 
         return branchManagerDTO;
     }
-
 }
