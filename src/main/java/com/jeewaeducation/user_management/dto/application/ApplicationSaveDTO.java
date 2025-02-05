@@ -1,6 +1,5 @@
 package com.jeewaeducation.user_management.dto.application;
 
-import com.jeewaeducation.user_management.entity.Reception;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
