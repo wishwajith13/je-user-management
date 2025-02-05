@@ -5,63 +5,70 @@ import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
 import com.jeewaeducation.user_management.dto.student.StudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
+import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
+import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Branch;
 import com.jeewaeducation.user_management.entity.Counselor;
 import com.jeewaeducation.user_management.entity.Student;
 import com.jeewaeducation.user_management.exception.NotFoundException;
+import com.jeewaeducation.user_management.repo.ApplicationRepo;
 import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.StudentService;
-import com.jeewaeducation.user_management.utility.mappers.StudentMapper;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class StudentServiceIMPL implements StudentService {
-    @Autowired
-    private StudentRepo studentRepo;
-    @Autowired
-    private CounselorRepo counselorRepo;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private StudentMapper studentMapper;
-    @Autowired
-    private BranchRepo branchRepo;
+    private final StudentRepo studentRepo;
+    private final CounselorRepo counselorRepo;
+    private final ModelMapper modelMapper;
+    private final BranchRepo branchRepo;
+    private final ApplicationRepo applicationRepo;
 
-    @Override
-    public String saveStudent(StudentSaveDTO studentSaveDTO) {
+    @Transactional
+        public String saveStudent(StudentSaveDTO studentSaveDTO) {
             Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId())
                     .orElseThrow(() -> new NotFoundException("Counselor not found"));
             Branch branch = branchRepo.findById(studentSaveDTO.getBranchId())
                     .orElseThrow(() -> new NotFoundException("Branch not found"));
-            Student student = new Student();
-            student.setStudentRating(studentSaveDTO.getStudentRating());
-            student.setStudentStatus(studentSaveDTO.getStudentStatus());
-            student.setCounselorId(counselor);
-            student.setBranchId(branch);
-            student.setStudentId(0);
-            System.out.println(student);
-            studentRepo.save(student);
-            return "Student ID: " + student.getStudentId() + " Saved";
+
+            Application application = applicationRepo.findById(studentSaveDTO.getApplicationId())
+                    .orElseThrow(() -> new NotFoundException("Application not found"));
+            if(studentRepo.existsByApplication(application)){
+                throw new NotFoundException("Student already exists with application ID: " + studentSaveDTO.getApplicationId());
+            }
+        Student student = new Student();
+        student.setStudentRating(studentSaveDTO.getStudentRating());
+        student.setStudentStatus(studentSaveDTO.getStudentStatus());
+        student.setCounselorId(counselor);
+        student.setBranchId(branch);
+        student.setApplication(application);
+
+        application.setStudent(student);
+        applicationRepo.save(application);
+
+        return "Student ID: " + application.getStudent().getStudentId() + " Saved";
     }
 
     @Override
-    public String updateStudent(StudentSaveDTO studentSaveDTO, int studentId) {
-        studentRepo.findById(studentId).orElseThrow(() -> new NotFoundException("Student not found"));
-        Counselor counselor = counselorRepo.findById(studentSaveDTO.getCounselorId())
-                .orElseThrow(() -> new NotFoundException("Counselor not found with ID: " + studentSaveDTO.getCounselorId()));
-        Branch branch = branchRepo.findById(studentSaveDTO.getBranchId())
-                .orElseThrow(() -> new NotFoundException("Branch not found with ID: " + studentSaveDTO.getBranchId()));
-        Student student = new Student();
+    public String updateStudent(StudentUpdateDTO studentUpdateDTO, int studentId) {
+        Student student = studentRepo.findById(studentId).orElseThrow(() -> new NotFoundException("Student not found"));
+        Counselor counselor = counselorRepo.findById(studentUpdateDTO.getCounselorId())
+                .orElseThrow(() -> new NotFoundException("Counselor not found with ID: " + studentUpdateDTO.getCounselorId()));
+        Branch branch = branchRepo.findById(studentUpdateDTO.getBranchId())
+                .orElseThrow(() -> new NotFoundException("Branch not found with ID: " + studentUpdateDTO.getBranchId()));
+
         student.setStudentId(studentId);
-        student.setStudentRating(studentSaveDTO.getStudentRating());
-        student.setStudentStatus(studentSaveDTO.getStudentStatus());
+        student.setStudentRating(studentUpdateDTO.getStudentRating());
+        student.setStudentStatus(studentUpdateDTO.getStudentStatus());
         student.setCounselorId(counselor);
         student.setBranchId(branch);
         studentRepo.save(student);
@@ -78,6 +85,12 @@ public class StudentServiceIMPL implements StudentService {
     @Override
     public StudentDTO getStudent(int id) {
         Student student = studentRepo.findById(id).orElseThrow(() -> new NotFoundException("Student not found"));
+        modelMapper.typeMap(Student.class, StudentDTO.class).addMappings(mapper -> {
+            mapper.map(Student::getCounselorId, StudentDTO::setCounselorId);
+            mapper.map(Student::getBranchId, StudentDTO::setBranchId);
+            mapper.map(Student::getApplication, StudentDTO::setApplicationId);
+        });
+
         return modelMapper.map(student, StudentDTO.class);
     }
 
