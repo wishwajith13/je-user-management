@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class BranchManagerSaveDTO {
+public class BranchManager_BranchDTO {
+    private int branchManagerId;
     private String branchManagerName;
     private int branchManagerContactNumber;
     private String branchManagerEmail;
-    private int branch;
 }

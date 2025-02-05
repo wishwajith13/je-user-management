@@ -3,19 +3,21 @@ package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.branch.BranchDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchSaveDTO;
+import com.jeewaeducation.user_management.dto.branch.Branch_BranchManagerDTO;
+import com.jeewaeducation.user_management.dto.branchManager.BranchManager_BranchDTO;
 import com.jeewaeducation.user_management.entity.Branch;
+import com.jeewaeducation.user_management.entity.BranchManager;
+import com.jeewaeducation.user_management.exception.AlreadyAssignedException;
 import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
-import com.jeewaeducation.user_management.repo.BranchRepo;
-import com.jeewaeducation.user_management.repo.CounselorRepo;
-import com.jeewaeducation.user_management.repo.ReceptionRepo;
-import com.jeewaeducation.user_management.repo.StudentRepo;
+import com.jeewaeducation.user_management.repo.*;
 import com.jeewaeducation.user_management.service.BranchService;
 import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,22 +41,38 @@ public class BranchServiceIMPL implements BranchService {
     @Autowired
     private ReceptionRepo receptionRepo;
 
+    @Autowired
+    private BranchManagerRepo branchManagerRepo;
 
     @Override
     public String saveBranch(BranchSaveDTO branchSaveDTO) {
         Branch branch = modelMapper.map(branchSaveDTO, Branch.class);
-        branch.setBranchID(0);//Ensure BranchID is not set from DTO
-        branchRepo.save(branch);
-        return branch.getBranchID() + " Saved";
 
+        branch.setBranchId(0); // Ensure BranchID is not set from DTO
+        branchRepo.save(branch);
+        return branch.getBranchId() + " Saved";
     }
+
     @Override
     public String updateBranch(BranchDTO branchDTO) {
-        Branch branch = modelMapper.map(branchDTO, Branch.class);
-        branchRepo.findById(branch.getBranchID()).orElseThrow(() -> new NotFoundException("Branch not found"));
-        branchRepo.save(branch);
-        return branch.getBranchID() + " Updated";
+        Branch branch = branchRepo.findById(branchDTO.getBranchID()).orElseThrow(() ->
+                new NotFoundException("Branch not found with ID: " + branchDTO.getBranchID()));
 
+        BranchManager branchManager = branchManagerRepo.findById(branchDTO.getBranchManagerId()).orElseThrow(() ->
+                new NotFoundException("Branch Manager not found with ID: " + branchDTO.getBranchManagerId()));
+
+        if (branchManager.getBranch() != null && branchManager.getBranch().getBranchId() != branch.getBranchId()) {
+            throw new AlreadyAssignedException("Branch Manager is already assigned to another branch");
+        }
+
+        branch.setBranchName(branchDTO.getBranchName());
+        branch.setBranchManager(branchManager);
+        branchManager.setBranch(branch);
+
+        branchRepo.save(branch);
+        branchManagerRepo.save(branchManager);
+
+        return branch.getBranchId() + " Updated";
     }
 
     @Override
@@ -63,7 +81,11 @@ public class BranchServiceIMPL implements BranchService {
         boolean isReferencedByCounselor = counselorRepo.existsByBranch(branch);
         boolean isReferencedByStudent = studentRepo.existsByBranchId(branch);
         boolean isReferencedByReception = receptionRepo.existsByBranch(branch);
-        if(isReferencedByReception){
+        boolean isReferencedByBranchManager = branchManagerRepo.existsByBranch(branch);
+        if (isReferencedByBranchManager) {
+            throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Branch Manager");
+        }
+        if (isReferencedByReception) {
             throw new ForeignKeyConstraintViolationException("Cannot delete branch as it is referenced by other records with Reception");
         }
         if (isReferencedByCounselor) {
@@ -77,20 +99,51 @@ public class BranchServiceIMPL implements BranchService {
     }
 
     @Override
-    public BranchDTO getBranch(int id) {
+    public Branch_BranchManagerDTO getBranch(int id) {
         Branch branch = branchRepo.findById(id).orElseThrow(() -> new NotFoundException("Branch not found"));
-        return modelMapper.map(branch, BranchDTO.class);
+
+        Branch_BranchManagerDTO branchDTO = new Branch_BranchManagerDTO();
+        branchDTO.setBranchID(branch.getBranchId());
+        branchDTO.setBranchName(branch.getBranchName());
+
+        BranchManager_BranchDTO branchManagerDTO = getBranchManagerBranchDTO(branch);
+        branchDTO.setBranchManagerId(branchManagerDTO);
+
+        return branchDTO;
     }
 
     @Override
-    public List<BranchDTO> getAllBranch() {
+    public List<Branch_BranchManagerDTO> getAllBranch() {
         List<Branch> branches = branchRepo.findAll();
         if (branches.isEmpty()) {
             throw new NotFoundException("No branches found");
         }
-        return branchMapper.entityListToDtoList(branches);
+
+        List<Branch_BranchManagerDTO> branchDTOs = new ArrayList<>();
+        for (Branch branch : branches) {
+            Branch_BranchManagerDTO branchDTO = new Branch_BranchManagerDTO();
+            branchDTO.setBranchID(branch.getBranchId());
+            branchDTO.setBranchName(branch.getBranchName());
+
+            BranchManager_BranchDTO branchManagerDTO = getBranchManagerBranchDTO(branch);
+            branchDTO.setBranchManagerId(branchManagerDTO);
+
+            branchDTOs.add(branchDTO);
+        }
+        return branchDTOs;
     }
 
+    private static BranchManager_BranchDTO getBranchManagerBranchDTO(Branch branch) {
+        BranchManager_BranchDTO branchManagerDTO = new BranchManager_BranchDTO();
+        BranchManager branchManager = branch.getBranchManager();
+        if (branchManager != null) {
+            branchManagerDTO.setBranchManagerId(branchManager.getBranchManagerId());
+            branchManagerDTO.setBranchManagerName(branchManager.getBranchManagerName());
+            branchManagerDTO.setBranchManagerContactNumber(branchManager.getBranchManagerContactNumber());
+            branchManagerDTO.setBranchManagerEmail(branchManager.getBranchManagerEmail());
+        }
+        return branchManagerDTO;
+    }
 
 
 }

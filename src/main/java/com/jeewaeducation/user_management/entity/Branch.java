@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Table(name = "branch")
+
 public class Branch {
 
     @Id
@@ -20,9 +22,15 @@ public class Branch {
     @Column(name = "branch_name", nullable = false)
     private String BranchName;
 
-
-
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "branch_manager_id", referencedColumnName = "branch_manager_id")
+    private BranchManager branchManager;
     //add to branchManagerId
+    public int getBranchId() {
+        return BranchID;
+    }
 
-
+    public void setBranchId(int BranchId) {
+        this.BranchID = BranchId;
+    }
 }
