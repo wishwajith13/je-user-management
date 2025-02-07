@@ -10,7 +10,6 @@ import com.jeewaeducation.user_management.exception.AlreadyAssignedException;
 import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.*;
-import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -21,8 +20,10 @@ import org.modelmapper.ModelMapper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -377,7 +378,7 @@ class BranchServiceIMPLTest {
         branchManager.setBranchManagerId(100);
         branchManager.setBranchManagerName("Doe");
         branchManager.setBranchManagerEmail("test@gmail.com");
-        branchManager.setBranchManagerContactNumber(01124567);
+        branchManager.setBranchManagerContactNumber(123458960);
 
         Branch branch = new Branch(1,"Colombo",branchManager);
 
@@ -412,21 +413,117 @@ class BranchServiceIMPLTest {
 
         BranchManager branchManager = new BranchManager();
         branchManager.setBranchManagerId(branchManagerId);
+        branchManager.setBranchManagerContactNumber(1234567890);
+        branchManager.setBranchManagerEmail("test@gmail.com");
+        branchManager.setBranchManagerName("John Doe");
+        branchManager.setBranch(branch);
+
         branch.setBranchManager(branchManager);
+
+        BranchManager_BranchDTO branchManagerBranchDTO = new BranchManager_BranchDTO();
+        branchManagerBranchDTO.setBranchManagerId(branchManagerId);
+        branchManagerBranchDTO.setBranchManagerContactNumber(branchManager.getBranchManagerContactNumber());
+        branchManagerBranchDTO.setBranchManagerEmail(branchManager.getBranchManagerEmail());
+        branchManagerBranchDTO.setBranchManagerName(branchManager.getBranchManagerName());
+
 
         when(branchRepo.findById(branchId))
                 .thenReturn(Optional.of(branch));
 
-
         Branch_BranchManagerDTO result = branchServiceIMPL.getBranch(branchId);
 
-        System.out.println(result);
-//        assertEquals(branch.getBranchId(),result.getBranchID());
-//        assertEquals(branch.getBranchName(),result.getBranchName());
-//
+        assertEquals(branch.getBranchId(),result.getBranchID());
+        assertEquals(branch.getBranchName(),result.getBranchName());
+        assertEquals(branchManagerBranchDTO,result.getBranchManagerId());
+
+        verify(branchRepo,times(1))
+                .findById(branchId);
+
 
     }
 
+    @Test
+    public void getAllBranch_WhenNoBranchesFound_ThrowsNotFoundException() {
+        when(branchRepo.findAll()).thenReturn(emptyList());
 
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+                branchServiceIMPL.getAllBranch()
+        );
+
+        assertEquals("No branches found", exception.getMessage());
+
+        verify(branchRepo, times(1)).findAll();
+    }
+
+    @Test
+    public void getAllBranch_WhenBranchesFound_ReturnBranch_BranchManagerDTOList() {
+        Branch branch1 = new Branch();
+        branch1.setBranchId(1);
+        branch1.setBranchName("Branch 1");
+
+        Branch branch2 = new Branch();
+        branch2.setBranchId(2);
+        branch2.setBranchName("Branch 2");
+
+
+        BranchManager branchManager1 = new BranchManager(
+                100,
+                "John Doe",
+                1234567890,
+                "test@gmail.com",
+                branch1);
+        BranchManager branchManager2 = new BranchManager(
+                101,
+                "Jane Doe",
+                1234567890,
+                "test2@gmail.com",
+                branch2);
+
+
+        branch1.setBranchManager(branchManager1);
+        branch2.setBranchManager(branchManager2);
+
+        List<Branch> branches = List.of(branch1, branch2);
+
+        when(branchRepo.findAll())
+                .thenReturn(branches);
+
+
+        BranchManager_BranchDTO branchManagerBranchDTO1 = new BranchManager_BranchDTO(
+                branchManager1.getBranchManagerId(),
+                branchManager1.getBranchManagerName(),
+                branchManager1.getBranchManagerContactNumber(),
+                branchManager1.getBranchManagerEmail()
+        );
+
+        BranchManager_BranchDTO branchManagerBranchDTO2 = new BranchManager_BranchDTO(
+                branchManager2.getBranchManagerId(),
+                branchManager2.getBranchManagerName(),
+                branchManager2.getBranchManagerContactNumber(),
+                branchManager2.getBranchManagerEmail()
+        );
+
+
+        Branch_BranchManagerDTO branchBranchManagerDTO1 = new Branch_BranchManagerDTO(
+                branch1.getBranchId(),
+                branch1.getBranchName(),
+                branchManagerBranchDTO1
+        );
+
+        Branch_BranchManagerDTO branchBranchManagerDTO2 = new Branch_BranchManagerDTO(
+                branch2.getBranchId(),
+                branch2.getBranchName(),
+                branchManagerBranchDTO2
+        );
+
+        List<Branch_BranchManagerDTO> expected = List.of(branchBranchManagerDTO1, branchBranchManagerDTO2);
+
+        List<Branch_BranchManagerDTO> result = branchServiceIMPL.getAllBranch();
+
+        assertEquals(expected, result);
+
+        verify(branchRepo, times(1))
+                .findAll();
+    }
 
 }
