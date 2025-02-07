@@ -39,7 +39,6 @@ public class StudentServiceIMPL implements StudentService {
                     .orElseThrow(() -> new NotFoundException("Counselor not found"));
             Branch branch = branchRepo.findById(studentSaveDTO.getBranchId())
                     .orElseThrow(() -> new NotFoundException("Branch not found"));
-
             Application application = applicationRepo.findById(studentSaveDTO.getApplicationId())
                     .orElseThrow(() -> new NotFoundException("Application not found"));
             if(studentRepo.existsByApplication(application)){
