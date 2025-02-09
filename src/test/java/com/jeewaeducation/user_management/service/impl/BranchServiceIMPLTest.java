@@ -382,8 +382,7 @@ class BranchServiceIMPLTest {
 
         Branch branch = new Branch(1,"Colombo",branchManager);
 
-        Method getBranchManagerBranchDTO =
-                BranchServiceIMPL.class
+        Method getBranchManagerBranchDTO = BranchServiceIMPL.class
                         .getDeclaredMethod("getBranchManagerBranchDTO", Branch.class);
         getBranchManagerBranchDTO.setAccessible(true);
 
