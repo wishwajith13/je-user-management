@@ -1,5 +1,9 @@
 package com.jeewaeducation.user_management.service.impl;
 
+import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
+import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
+import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
+import com.jeewaeducation.user_management.dto.student.StudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
 import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
 import com.jeewaeducation.user_management.entity.Application;
@@ -191,7 +195,8 @@ class StudentServiceIMPLTest {
 
         application.setStudent(student);
 
-        ArgumentCaptor<Application> applicationArgumentCaptor = ArgumentCaptor.forClass(Application.class);
+        ArgumentCaptor<Application> applicationArgumentCaptor =
+                ArgumentCaptor.forClass(Application.class);
 
         when(applicationRepo.save(applicationArgumentCaptor.capture()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -333,41 +338,43 @@ class StudentServiceIMPLTest {
                 3
         );
 
-        Student student = new Student();
-        student.setStudentId(studentID);
-        student.setStudentRating(studentUpdateDTO.getStudentRating());
-        student.setStudentStatus(studentUpdateDTO.getStudentStatus());
+        Student existingStudent = new Student();
+        existingStudent.setStudentId(studentID);
+        existingStudent.setStudentRating("average");
+        existingStudent.setStudentStatus("processing");
 
-        Counselor counselor = new Counselor();
-        counselor.setCounselorId(studentUpdateDTO.getCounselorId());
+        Counselor initialCounselor = new Counselor();
+        initialCounselor.setCounselorId(10);
+        existingStudent.setCounselorId(initialCounselor);
 
-        Branch branch = new Branch();
-        branch.setBranchId(studentUpdateDTO.getBranchId());
+        Branch initialBranch = new Branch();
+        initialBranch.setBranchId(20);
+        existingStudent.setBranchId(initialBranch);
 
-        student.setBranchId(branch);
-        student.setCounselorId(counselor);
+
+        Counselor newCounselor = new Counselor();
+        newCounselor.setCounselorId(studentUpdateDTO.getCounselorId());
+
+        Branch newBranch = new Branch();
+        newBranch.setBranchId(studentUpdateDTO.getBranchId());
 
 
         when(studentRepo.findById(studentID)).
-                thenReturn(Optional.of(student));
+                thenReturn(Optional.of(existingStudent));
 
         when(counselorRepo.findById(studentUpdateDTO.getCounselorId()))
-                .thenReturn(Optional.of(counselor));
+                .thenReturn(Optional.of(newCounselor));
 
         when(branchRepo.findById(studentUpdateDTO.getBranchId()))
-                .thenReturn(Optional.of(branch));
+                .thenReturn(Optional.of(newBranch));
 
-        ArgumentCaptor<Student> studentArgumentCaptor = ArgumentCaptor.forClass(Student.class);
+        existingStudent.setStudentId(studentID);
+        existingStudent.setStudentRating(studentUpdateDTO.getStudentRating());
+        existingStudent.setStudentStatus(studentUpdateDTO.getStudentStatus());
+        existingStudent.setCounselorId(newCounselor);
+        existingStudent.setBranchId(newBranch);
 
-        when(studentRepo.save(studentArgumentCaptor.capture())).thenAnswer(
-                invocationOnMock -> invocationOnMock.getArgument(0)
-        );
-
-        System.out.println(studentArgumentCaptor.getValue());
-
-        String message = studentServiceIMPL.updateStudent(studentUpdateDTO,studentID);
-
-        assertEquals(student.getStudentId() + " Updated",message);
+        String result = studentServiceIMPL.updateStudent(studentUpdateDTO,studentID);
 
         verify(studentRepo,times(1))
                 .findById(studentID);
@@ -375,9 +382,75 @@ class StudentServiceIMPLTest {
                 .findById(studentUpdateDTO.getCounselorId());
         verify(branchRepo,times(1))
                 .findById(studentUpdateDTO.getBranchId());
+
+        ArgumentCaptor<Student> studentArgumentCaptor = ArgumentCaptor.forClass(Student.class);
         verify(studentRepo,times(1))
-                .save(student);
+                .save(studentArgumentCaptor.capture());
+        Student updatedStudent = studentArgumentCaptor.getValue();
+
+        assertEquals(studentID + " Updated",result);
+
+        assertEquals(studentID,updatedStudent.getStudentId());
+        assertEquals(studentUpdateDTO.getStudentRating(),updatedStudent.getStudentRating());
+        assertEquals(studentUpdateDTO.getStudentStatus(),updatedStudent.getStudentStatus());
+        assertEquals(newCounselor,updatedStudent.getCounselorId());
+        assertEquals(newBranch,updatedStudent.getBranchId());
+
+
     }
 
+    @Test
+    public void deleteStudent_WhenStudentNotFound_ThrowNotFoundException() {
+        int studentID = 1;
+
+        when(studentRepo.findById(studentID)).
+                thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> studentServiceIMPL.deleteStudent(studentID));
+
+        assertEquals("Student not found", exception.getMessage());
+
+        verify(studentRepo, times(1))
+                .findById(studentID);
+        verify(studentRepo, never())
+                .deleteById(any());
+    }
+
+    @Test
+    public void deleteStudent_WhenStudentFound_DeleteStudent(){
+        int studentID = 1;
+        Student student = mock(Student.class);
+
+        when(studentRepo.findById(studentID)).
+                thenReturn(Optional.of(student));
+
+        String result = studentServiceIMPL.deleteStudent(studentID);
+
+        assertEquals("Student " + studentID + " Deleted",result);
+
+        verify(studentRepo,times(1))
+                .findById(studentID);
+        verify(studentRepo,times(1))
+                .deleteById(studentID);
+    }
+
+    @Test
+    public void getStudent_WhenStudentNotFound_ThrowNotFoundException(){
+        int studentID = 1;
+
+        when(studentRepo.findById(studentID)).
+                thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                ()-> studentServiceIMPL.getStudent(studentID));
+
+        assertEquals("Student not found",exception.getMessage());
+
+        verify(studentRepo,times(1)
+        ).findById(studentID);
+        verify(modelMapper,never())
+                .map(any(),any());
+    }
 
 }
