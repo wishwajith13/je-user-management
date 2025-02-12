@@ -22,9 +22,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 
+import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -453,4 +456,126 @@ class StudentServiceIMPLTest {
                 .map(any(),any());
     }
 
+    @Test
+    public void getStudent_WhenStudentFound_ReturnStudentDto(){
+        Counselor counselor = mock(Counselor.class);
+        Branch branch = mock(Branch.class);
+        Application application = mock(Application.class);
+
+        CounselorGetDTO counselorGetDTO = new CounselorGetDTO();
+        counselorGetDTO.setCounselorId(counselor.getCounselorId());
+
+        BranchGetDTO branchGetDTO = new BranchGetDTO();
+        branchGetDTO.setBranchName(branch.getBranchName());
+
+        ApplicationGetDTO applicationGetDTO = new ApplicationGetDTO();
+        applicationGetDTO.setApplicationId(application.getApplicationId());
+
+
+        Student student = new Student();
+        student.setStudentId(1);
+        student.setCounselorId(counselor);
+        student.setBranchId(branch);
+        student.setApplication(application);
+
+        StudentDTO studentDTO = new StudentDTO();
+        studentDTO.setStudentId(1);
+        studentDTO.setCounselorId(counselorGetDTO);
+        studentDTO.setBranchId(branchGetDTO);
+        studentDTO.setApplicationId(applicationGetDTO);
+
+        when(studentRepo.findById(1)).
+                thenReturn(Optional.of(student));
+
+        when(modelMapper.map(student,StudentDTO.class)).
+                thenReturn(studentDTO);
+
+        TypeMap<Student, StudentDTO> typeMap = mock(TypeMap.class);
+        when(modelMapper.typeMap(Student.class, StudentDTO.class))
+                .thenReturn(typeMap);
+
+        StudentDTO result = studentServiceIMPL.getStudent(1);
+
+        assertEquals(studentDTO,result);
+
+        verify(studentRepo, times(1)).findById(1);
+        verify(modelMapper, times(1)).map(student, StudentDTO.class);
+
+    }
+
+    @Test
+    public void getAllStudent_WhenStudentRepoEmpty_ReturnNotFoundException(){
+        when(studentRepo.findAll()).
+                thenReturn(emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                ()-> studentServiceIMPL.getAllStudents());
+
+        assertEquals("No students found",exception.getMessage());
+
+        verify(studentRepo,times(1)
+        ).findAll();
+        verify(modelMapper,never())
+                .map(any(),any());
+    }
+
+    @Test
+    public void getAllStudent_WhenStudentRepoNotEmpty_ReturnStudentDtoList() {
+
+        Counselor counselor = mock(Counselor.class);
+        Branch branch = mock(Branch.class);
+        Application application = mock(Application.class);
+
+        CounselorGetDTO counselorGetDTO = new CounselorGetDTO();
+        counselorGetDTO.setCounselorId(counselor.getCounselorId());
+
+        BranchGetDTO branchGetDTO = new BranchGetDTO();
+        branchGetDTO.setBranchName(branch.getBranchName());
+
+        ApplicationGetDTO applicationGetDTO = new ApplicationGetDTO();
+        applicationGetDTO.setApplicationId(application.getApplicationId());
+
+
+        Student student = new Student();
+        student.setStudentId(1);
+        student.setCounselorId(counselor);
+        student.setBranchId(branch);
+        student.setApplication(application);
+
+        StudentDTO studentDTO = new StudentDTO();
+        studentDTO.setStudentId(1);
+        studentDTO.setCounselorId(counselorGetDTO);
+        studentDTO.setBranchId(branchGetDTO);
+        studentDTO.setApplicationId(applicationGetDTO);
+
+        List<Student> students = List.of(student);
+
+        when(studentRepo.findAll()).
+                thenReturn(students);
+
+        when(modelMapper.map(student, StudentDTO.class)).
+                thenReturn(studentDTO);
+        when(modelMapper.map(student.getBranchId(), BranchGetDTO.class)).
+                thenReturn(new BranchGetDTO());
+        when(modelMapper.map(student.getCounselorId(), CounselorGetDTO.class)).
+                thenReturn(new CounselorGetDTO());
+
+        List<StudentDTO> result = studentServiceIMPL.getAllStudents();
+
+        assertEquals(1, result.size());
+        assertEquals(studentDTO, result.get(0));
+        assertEquals(studentDTO.getStudentId(), result.get(0).getStudentId());
+        assertEquals(studentDTO.getCounselorId(), result.get(0).getCounselorId());
+
+
+        verify(studentRepo, times(1)).findAll();
+        verify(modelMapper, times(1)).map(student, StudentDTO.class);
+        verify(modelMapper, times(1)).map(student.getBranchId(), BranchGetDTO.class);
+        verify(modelMapper, times(1)).map(student.getCounselorId(), CounselorGetDTO.class);
+
+
+
+
+
+    }
 }
