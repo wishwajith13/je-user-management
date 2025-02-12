@@ -13,38 +13,25 @@ import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.*;
 import com.jeewaeducation.user_management.service.BranchService;
 import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class BranchServiceIMPL implements BranchService {
 
-    @Autowired
     private BranchRepo branchRepo;
-
-    @Autowired
     private ModelMapper modelMapper;
-
-    @Autowired
     private BranchMapper branchMapper;
-
-    @Autowired
     private CounselorRepo counselorRepo;
-
-    @Autowired
     private StudentRepo studentRepo;
-
-    @Autowired
     private ReceptionRepo receptionRepo;
-
-    @Autowired
     private BranchManagerRepo branchManagerRepo;
 
-    @Override
     public String saveBranch(BranchSaveDTO branchSaveDTO) {
         Branch branch = modelMapper.map(branchSaveDTO, Branch.class);
 
@@ -77,7 +64,9 @@ public class BranchServiceIMPL implements BranchService {
 
     @Override
     public String deleteBranch(int id) {
-        Branch branch = branchRepo.findById(id).orElseThrow(() -> new NotFoundException("Branch not found"));
+        Branch branch = branchRepo.findById(id).orElseThrow(
+                () -> new NotFoundException("Branch not found")
+        );
         boolean isReferencedByCounselor = counselorRepo.existsByBranch(branch);
         boolean isReferencedByStudent = studentRepo.existsByBranchId(branch);
         boolean isReferencedByReception = receptionRepo.existsByBranch(branch);

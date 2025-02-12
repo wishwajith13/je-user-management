@@ -39,7 +39,6 @@ public class StudentServiceIMPL implements StudentService {
                     .orElseThrow(() -> new NotFoundException("Counselor not found"));
             Branch branch = branchRepo.findById(studentSaveDTO.getBranchId())
                     .orElseThrow(() -> new NotFoundException("Branch not found"));
-
             Application application = applicationRepo.findById(studentSaveDTO.getApplicationId())
                     .orElseThrow(() -> new NotFoundException("Application not found"));
             if(studentRepo.existsByApplication(application)){
@@ -60,7 +59,8 @@ public class StudentServiceIMPL implements StudentService {
 
     @Override
     public String updateStudent(StudentUpdateDTO studentUpdateDTO, int studentId) {
-        Student student = studentRepo.findById(studentId).orElseThrow(() -> new NotFoundException("Student not found"));
+        Student student = studentRepo.findById(studentId)
+                .orElseThrow(() -> new NotFoundException("Student not found"));
         Counselor counselor = counselorRepo.findById(studentUpdateDTO.getCounselorId())
                 .orElseThrow(() -> new NotFoundException("Counselor not found with ID: " + studentUpdateDTO.getCounselorId()));
         Branch branch = branchRepo.findById(studentUpdateDTO.getBranchId())
