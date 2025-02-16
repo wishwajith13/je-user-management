@@ -4,18 +4,16 @@ import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationStudentBasicDetailsGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
-import com.jeewaeducation.user_management.dto.reception.ReceptionDTO;
+import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Reception;
 import com.jeewaeducation.user_management.entity.Student;
 import com.jeewaeducation.user_management.exception.DuplicateKeyException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.ApplicationRepo;
-import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.ReceptionRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.ApplicationService;
-import com.jeewaeducation.user_management.service.StudentService;
 import com.jeewaeducation.user_management.utility.mappers.ApplicationMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +74,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
         Application application = applicationRepo.findById(applicationId).orElseThrow(() -> new NotFoundException("Application not found with ID: " + applicationId));
         ApplicationGetDTO applicationGetDTO = modelMapper.map(application, ApplicationGetDTO.class);
         Reception reception = application.getReception();
-        ReceptionDTO receptionDTO = modelMapper.map(reception, ReceptionDTO.class);//only got id and name
+        ReceptionForApplicationDTO receptionDTO = modelMapper.map(reception, ReceptionForApplicationDTO.class);//only got id and name
         applicationGetDTO.setReception(receptionDTO);
         return applicationGetDTO;
     }
