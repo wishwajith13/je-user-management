@@ -1,8 +1,9 @@
 package com.jeewaeducation.user_management.service.impl;
 
 
+import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
-import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
+import com.jeewaeducation.user_management.dto.counselor.CounselorForStudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
 import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
@@ -106,7 +107,10 @@ public class StudentServiceIMPL implements StudentService {
                 studentDTO.setBranchId(modelMapper.map(student.getBranchId(), BranchGetDTO.class));
             }
             if (student.getCounselorId() != null) {
-                studentDTO.setCounselorId(modelMapper.map(student.getCounselorId(), CounselorGetDTO.class));
+                studentDTO.setCounselorId(modelMapper.map(student.getCounselorId(), CounselorForStudentDTO.class));
+            }
+            if (student.getApplication() != null) {
+                studentDTO.setApplicationId(modelMapper.map(student.getApplication(), ApplicationGetDTO.class));
             }
             return studentDTO;
         }).collect(Collectors.toList());
