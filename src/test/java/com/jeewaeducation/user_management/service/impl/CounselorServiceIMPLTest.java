@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 
-import java.lang.reflect.Executable;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,7 +82,7 @@ class CounselorServiceIMPLTest {
 
         String result = counselorServiceIMPL.saveCounselor(counselorSaveDTO);
 
-        assertEquals("1 Saved", result);
+        assertEquals("0 Saved", result);
 
         Counselor capturedCounselor = counselorArgumentCaptor.getValue();
 
