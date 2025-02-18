@@ -480,7 +480,9 @@ class StudentServiceIMPLTest {
 
         StudentDTO studentDTO = new StudentDTO();
         studentDTO.setStudentId(1);
+
         studentDTO.setCounselorId(counselorForStudentDTO);
+
         studentDTO.setBranchId(branchGetDTO);
         studentDTO.setApplicationId(applicationGetDTO);
 
@@ -544,8 +546,10 @@ class StudentServiceIMPLTest {
 
         StudentDTO studentDTO = new StudentDTO();
         studentDTO.setStudentId(1);
+
         studentDTO.setCounselorId(counselorForStudentDTO);
         studentDTO.setBranchId(branchGetDTO);
+
         studentDTO.setApplicationId(applicationGetDTO);
 
         List<Student> students = List.of(student);
