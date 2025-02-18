@@ -40,10 +40,12 @@ public class AdmissionManagerServiceIMPLTest {
 
     private AdmissionManagerSaveDTO admissionManagerSaveDTO;
     private AdmissionManager admissionManager;
+    private AdmissionManagerDTO admissionManagerDTO;
 
     @BeforeEach
     public void setUp() {
         admissionManagerSaveDTO = new AdmissionManagerSaveDTO();
+        admissionManagerDTO = new AdmissionManagerDTO();
         admissionManager = new AdmissionManager();
         admissionManager.setAdmissionManagerId(123);
     }
@@ -123,8 +125,83 @@ public class AdmissionManagerServiceIMPLTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(0, result.size()); // Adjust based on what your mapper returns
+        assertEquals(0, result.size());
         verify(admissionManagerRepo).findAll();
         verify(admissionManagerMapper).entityListToDtoList(admissionManagers);
+    }
+
+    @Test
+    public void testGetAllAdmissionManager_NotFound() {
+        // Arrange
+        when(admissionManagerRepo.findAll()).thenReturn(new ArrayList<>()); // Return an empty list
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            admissionManagerService.getAllAdmissionManager();
+        });
+
+        assertEquals("No Admission Manager found", exception.getMessage());
+        verify(admissionManagerRepo).findAll();
+        verify(admissionManagerMapper, never()).entityListToDtoList(any());
+    }
+
+    @Test
+    public void testUpdateAdmissionManager_Success() {
+        // Arrange
+        when(modelMapper.map(admissionManagerDTO, AdmissionManager.class)).thenReturn(admissionManager);
+        when(admissionManagerRepo.findById(admissionManager.getAdmissionManagerId())).thenReturn(Optional.of(admissionManager));
+
+        // Act
+        String result = admissionManagerService.updateAdmissionManager(admissionManagerDTO);
+
+        // Assert
+        verify(admissionManagerRepo).save(admissionManager);
+        assertEquals("123 Updated", result);
+    }
+
+    @Test
+    public void testUpdateAdmissionManager_NotFound() {
+        // Arrange
+        when(modelMapper.map(admissionManagerDTO, AdmissionManager.class)).thenReturn(admissionManager);
+        when(admissionManagerRepo.findById(admissionManager.getAdmissionManagerId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            admissionManagerService.updateAdmissionManager(admissionManagerDTO);
+        });
+
+        assertEquals("AdmissionManager not found", exception.getMessage());
+        verify(admissionManagerRepo, never()).save(any());
+    }
+
+    @Test
+    public void testGetAdmissionManagerById_Success() {
+        // Arrange
+        when(admissionManagerRepo.findById(admissionManager.getAdmissionManagerId())).thenReturn(Optional.of(admissionManager));
+        when(modelMapper.map(admissionManager, AdmissionManagerDTO.class)).thenReturn(admissionManagerDTO);
+
+        // Act
+        AdmissionManagerDTO result = admissionManagerService.getAdmissionManagerById(admissionManager.getAdmissionManagerId());
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(admissionManagerDTO, result); // Check if the returned DTO is as expected
+        verify(admissionManagerRepo).findById(admissionManager.getAdmissionManagerId());
+        verify(modelMapper).map(admissionManager, AdmissionManagerDTO.class);
+    }
+
+    @Test
+    public void testGetAdmissionManagerById_NotFound() {
+        // Arrange
+        when(admissionManagerRepo.findById(admissionManager.getAdmissionManagerId())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            admissionManagerService.getAdmissionManagerById(admissionManager.getAdmissionManagerId());
+        });
+
+        assertEquals("AdmissionManager not found", exception.getMessage());
+        verify(admissionManagerRepo).findById(admissionManager.getAdmissionManagerId());
+        verify(modelMapper, never()).map(any(), any()); // Ensure map is not called
     }
 }
