@@ -10,23 +10,23 @@ import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.CounselorService;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class CounselorServiceIMPL implements CounselorService {
 
-    @Autowired
     private  CounselorRepo counselorRepo;
-    @Autowired
+
     private  ModelMapper modelMapper;
-    @Autowired
+
     private  BranchRepo branchRepo;
-    @Autowired
+
     private  StudentRepo studentRepo;
 
     @Override
@@ -47,7 +47,7 @@ public class CounselorServiceIMPL implements CounselorService {
             throw  new ForeignKeyConstraintViolationException("Cannot delete counselor as it is referenced by other records");
         }
         counselorRepo.deleteById(counselorId);
-        return "Counselor with ID"+counselorId+"has been Deleted";
+        return "Counselor with ID "+counselorId+" has been Deleted";
 
     }
 

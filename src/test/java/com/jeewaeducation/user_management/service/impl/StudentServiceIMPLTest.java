@@ -2,7 +2,7 @@ package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
-import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
+import com.jeewaeducation.user_management.dto.counselor.CounselorForStudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
 import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
@@ -462,8 +462,8 @@ class StudentServiceIMPLTest {
         Branch branch = mock(Branch.class);
         Application application = mock(Application.class);
 
-        CounselorGetDTO counselorGetDTO = new CounselorGetDTO();
-        counselorGetDTO.setCounselorId(counselor.getCounselorId());
+        CounselorForStudentDTO counselorForStudentDTO = new CounselorForStudentDTO();
+        counselorForStudentDTO.setCounselorName(counselor.getCounselorName());
 
         BranchGetDTO branchGetDTO = new BranchGetDTO();
         branchGetDTO.setBranchName(branch.getBranchName());
@@ -480,7 +480,9 @@ class StudentServiceIMPLTest {
 
         StudentDTO studentDTO = new StudentDTO();
         studentDTO.setStudentId(1);
-//        studentDTO.setCounselorId(counselo);
+
+        studentDTO.setCounselorId(counselorForStudentDTO);
+
         studentDTO.setBranchId(branchGetDTO);
         studentDTO.setApplicationId(applicationGetDTO);
 
@@ -526,8 +528,8 @@ class StudentServiceIMPLTest {
         Branch branch = mock(Branch.class);
         Application application = mock(Application.class);
 
-        CounselorGetDTO counselorGetDTO = new CounselorGetDTO();
-        counselorGetDTO.setCounselorId(counselor.getCounselorId());
+        CounselorForStudentDTO  counselorForStudentDTO  = new CounselorForStudentDTO();
+        counselorForStudentDTO.setCounselorName(counselor.getCounselorName());
 
         BranchGetDTO branchGetDTO = new BranchGetDTO();
         branchGetDTO.setBranchName(branch.getBranchName());
@@ -544,8 +546,10 @@ class StudentServiceIMPLTest {
 
         StudentDTO studentDTO = new StudentDTO();
         studentDTO.setStudentId(1);
-//        studentDTO.setCounselorId(counselorGetDTO);
-//        studentDTO.setBranchId(branchGetDTO);
+
+        studentDTO.setCounselorId(counselorForStudentDTO);
+        studentDTO.setBranchId(branchGetDTO);
+
         studentDTO.setApplicationId(applicationGetDTO);
 
         List<Student> students = List.of(student);
@@ -557,8 +561,8 @@ class StudentServiceIMPLTest {
                 thenReturn(studentDTO);
         when(modelMapper.map(student.getBranchId(), BranchGetDTO.class)).
                 thenReturn(new BranchGetDTO());
-        when(modelMapper.map(student.getCounselorId(), CounselorGetDTO.class)).
-                thenReturn(new CounselorGetDTO());
+        when(modelMapper.map(student.getCounselorId(), CounselorForStudentDTO.class)).
+                thenReturn(new CounselorForStudentDTO());
 
         List<StudentDTO> result = studentServiceIMPL.getAllStudents();
 
@@ -571,7 +575,7 @@ class StudentServiceIMPLTest {
         verify(studentRepo, times(1)).findAll();
         verify(modelMapper, times(1)).map(student, StudentDTO.class);
         verify(modelMapper, times(1)).map(student.getBranchId(), BranchGetDTO.class);
-        verify(modelMapper, times(1)).map(student.getCounselorId(), CounselorGetDTO.class);
+        verify(modelMapper, times(1)).map(student.getCounselorId(), CounselorForStudentDTO.class);
 
 
 
