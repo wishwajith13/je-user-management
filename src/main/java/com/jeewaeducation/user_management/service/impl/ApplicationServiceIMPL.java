@@ -15,7 +15,6 @@ import com.jeewaeducation.user_management.repo.ReceptionRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.ApplicationService;
 import com.jeewaeducation.user_management.utility.mappers.ApplicationMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -81,14 +80,14 @@ public class ApplicationServiceIMPL implements ApplicationService {
 
     @Override
     public String updateApplication(ApplicationUpdateDTO applicationUpdateDTO) { //Not given to update reception details for company security reason
-        Application application = modelMapper.map(applicationUpdateDTO, Application.class);
-        applicationRepo.findById(application.getApplicationId()).orElseThrow(() ->
-                new NotFoundException("Application not found with ID: " + application.getApplicationId()));
+        applicationRepo.findById(applicationUpdateDTO.getApplicationId()).orElseThrow(() ->
+                new NotFoundException("Application not found with ID: " + applicationUpdateDTO.getApplicationId()));
         Reception reception = receptionRepo.findById((applicationUpdateDTO.getReception())).orElseThrow(() ->
                 new NotFoundException("Reception not found with ID: " + applicationUpdateDTO.getReception()));
+        Application application = modelMapper.map(applicationUpdateDTO, Application.class);
         application.setReception(reception);
-        applicationRepo.findById(application.getApplicationId()).orElseThrow(() ->
-                new EntityNotFoundException("Application not found with ID: " + application.getApplicationId()));//TODO: exception handling
+//        applicationRepo.findById(application.getApplicationId()).orElseThrow(() ->
+//                new EntityNotFoundException("Application not found with ID: " + application.getApplicationId()));//TODO: exception handling
         applicationRepo.save(application);
         return application.getApplicationId() + "Updated";
     }
