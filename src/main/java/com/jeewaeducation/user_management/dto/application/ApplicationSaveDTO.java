@@ -46,5 +46,6 @@ public class ApplicationSaveDTO {
     private String preferredStudyCountry;
     private String preferredCity;
     private String methodeOfKnowing;
+    private boolean isVerified;
     private int reception;
 }

@@ -91,6 +91,8 @@ public class Application {
     private String preferredCity;
     @Column(name = "methode_of_Knowing",nullable = false)
     private String methodeOfKnowing;
+    @Column(name = "verification_status",nullable = false)
+    private boolean isVerified;
 
     @ManyToOne
     @JoinColumn(name = "reception_id")

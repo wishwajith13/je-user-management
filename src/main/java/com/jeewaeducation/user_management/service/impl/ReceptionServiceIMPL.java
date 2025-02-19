@@ -13,7 +13,6 @@ import com.jeewaeducation.user_management.service.ReceptionService;
 import com.jeewaeducation.user_management.utility.mappers.ReceptionMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,7 +33,6 @@ public class ReceptionServiceIMPL implements ReceptionService {
         Reception reception = modelMapper.map(receptionSaveDTO, Reception.class);
         reception.setReceptionId(0);
         reception.setBranch(branch);
-        System.out.println(reception);
         receptionRepo.save(reception);
         return reception.getReceptionId() + " Saved";
     }
