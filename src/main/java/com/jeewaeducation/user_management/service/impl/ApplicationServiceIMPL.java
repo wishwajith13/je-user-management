@@ -31,8 +31,8 @@ public class ApplicationServiceIMPL implements ApplicationService {
     private final ApplicationMapper applicationMapper;
     private final StudentRepo studentRepo;
 
-        @Transactional
-        public String saveApplication(ApplicationSaveDTO applicationSaveDTO) {
+    @Transactional
+    public String saveApplication(ApplicationSaveDTO applicationSaveDTO) {
             Application application = modelMapper.map(applicationSaveDTO, Application.class);
 
             Reception reception = receptionRepo.findById(applicationSaveDTO.getReception())
@@ -46,15 +46,12 @@ public class ApplicationServiceIMPL implements ApplicationService {
             Student student = new Student();
             student.setStudentRating("NA");
             student.setStudentStatus("NA");
-//            student.setCounselorId(counselorRepo.findById(603)
-//                    .orElseThrow(() -> new NotFoundException("Counselor not found")));
             student.setBranchId(reception.getBranch()); // Assign branch from reception
             student.setApplication(application); // Link Student to Application
 
             studentRepo.save(student);
 
             //application.setStudent(savedStudent);
-
             Application savedApplication = applicationRepo.save(application);
 
             return "Application ID: " + savedApplication.getApplicationId() + " and Student ID: " + student.getStudentId() + " Saved";
