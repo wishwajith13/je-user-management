@@ -1,9 +1,6 @@
 package com.jeewaeducation.user_management.service.impl;
 
-import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationStudentBasicDetailsGetDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
+import com.jeewaeducation.user_management.dto.application.*;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Branch;
@@ -45,22 +42,6 @@ public class ApplicationServiceIMPLTest {
     private StudentRepo studentRepo;
     @InjectMocks
     private ApplicationServiceIMPL applicationServiceIMPL;
-
-//    private Application application;
-//    private Reception reception;
-//    private ApplicationSaveDTO applicationSaveDTO;
-//
-//    @BeforeEach
-//    void setUp() {
-//        application = new Application();
-//        application.setApplicationId(1);
-//
-//        reception = new Reception();
-//        reception.setReceptionId(1);
-//
-//        applicationSaveDTO = new ApplicationSaveDTO();
-//        applicationSaveDTO.setReception(1);
-//    }
 
     @Test
     public void saveApplication_whenReceptionNotFound_throwsNotFoundException() {
@@ -548,6 +529,56 @@ public class ApplicationServiceIMPLTest {
         verify(applicationMapper, times(1))
                 .entityListToDtoList(applications);
     }
+
+    @Test
+    public void updateApplicationVerification_whenApplicationNotFound_throwsNotFoundException() {
+        int applicationId = 1;
+        ApplicationVerificationUpdateDTO applicationVerificationUpdateDTO = new ApplicationVerificationUpdateDTO(
+                false
+        );
+
+        when(applicationRepo.findById(applicationId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.updateApplicationVerification(applicationVerificationUpdateDTO, applicationId));
+
+        assertEquals("Application not found with ID: " + applicationId, exception.getMessage());
+
+        verify(applicationRepo, times(1))
+                .findById(applicationId);
+        verify(applicationRepo, never()).save(any());
+    }
+
+    @Test
+    public void updateApplicationVerification_whenAllDataIsValid_updatesApplicationVerification() {
+        int applicationId = 1;
+        ApplicationVerificationUpdateDTO applicationVerificationUpdateDTO = new ApplicationVerificationUpdateDTO(
+                true
+        );
+        Application existingApplication = getExistingApplication(applicationId);
+
+        Application newApplication = new Application();
+        newApplication.setApplicationId(applicationId);
+        newApplication.setVerified(applicationVerificationUpdateDTO.isVerified());
+
+        when(applicationRepo.findById(applicationId))
+                .thenReturn(Optional.of(existingApplication));
+        existingApplication.setVerified(applicationVerificationUpdateDTO.isVerified());
+        when(applicationRepo.save(existingApplication))
+                .thenReturn(newApplication);
+
+        String result = applicationServiceIMPL.updateApplicationVerification(applicationVerificationUpdateDTO, applicationId);
+
+        assertEquals(applicationId + "Updated " + "Verification Status: " + applicationVerificationUpdateDTO.isVerified(), result);
+
+        verify(applicationRepo, times(1))
+                .findById(applicationId);
+        verify(applicationRepo, times(1))
+                .save(existingApplication);
+
+    }
+
 
     private static Application getExistingApplication(int applicationId) {
         Application existingApplication = new Application();

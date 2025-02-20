@@ -49,5 +49,6 @@ public class ApplicationGetDTO {
     private String preferredStudyCountry;
     private String preferredCity;
     private String methodeOfKnowing;
+    private boolean isVerified;
     private ReceptionForApplicationDTO reception;
 }
