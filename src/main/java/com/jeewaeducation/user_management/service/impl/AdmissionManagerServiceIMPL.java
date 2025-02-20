@@ -7,20 +7,18 @@ import com.jeewaeducation.user_management.exception.DuplicateKeyException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.AdmissionManagerRepo;
 import com.jeewaeducation.user_management.service.AdmissionManagerService;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.jeewaeducation.user_management.utility.mappers.AdmissionManagerMapper;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class AdmissionManagerServiceIMPL implements AdmissionManagerService {
-    @Autowired
     private AdmissionManagerRepo admissionManagerRepo;
-    @Autowired
     private ModelMapper modelMapper;
-    @Autowired
     private AdmissionManagerMapper admissionManagerMapper;
 
     @Override
