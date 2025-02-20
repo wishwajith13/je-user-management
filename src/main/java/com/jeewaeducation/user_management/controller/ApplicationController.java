@@ -1,9 +1,6 @@
 package com.jeewaeducation.user_management.controller;
 
-import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationStudentBasicDetailsGetDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
+import com.jeewaeducation.user_management.dto.application.*;
 import com.jeewaeducation.user_management.service.ApplicationService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +58,12 @@ public class ApplicationController {
     @PutMapping
     public ResponseEntity<StandardResponse> updateApplication(@RequestBody ApplicationUpdateDTO applicationUpdateDTO) {
         String message = applicationService.updateApplication(applicationUpdateDTO);
+        return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
+    }
+
+    @PutMapping("/verification/{id}")
+    public  ResponseEntity<StandardResponse> updateApplicationVerification(@PathVariable int id, @RequestBody ApplicationVerificationUpdateDTO applicationVerificationUpdateDTO) {
+        String message = applicationService.updateApplicationVerification(applicationVerificationUpdateDTO, id);
         return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 }
