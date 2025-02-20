@@ -1,9 +1,6 @@
 package com.jeewaeducation.user_management.service.impl;
 
-import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationStudentBasicDetailsGetDTO;
-import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
+import com.jeewaeducation.user_management.dto.application.*;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Reception;
@@ -86,6 +83,16 @@ public class ApplicationServiceIMPL implements ApplicationService {
         applicationRepo.save(application);
         return application.getApplicationId() + "Updated";
     }
+
+    @Override
+    public  String updateApplicationVerification(ApplicationVerificationUpdateDTO applicationVerificationUpdateDTO, int applicationId){
+        Application application = applicationRepo.findById(applicationId).orElseThrow(() ->
+                new NotFoundException("Application not found with ID: " + applicationId));
+        application.setVerified(applicationVerificationUpdateDTO.isVerified());
+        applicationRepo.save(application);
+        return application.getApplicationId() + "Updated " + "Verification Status: " + application.isVerified();
+    }
+
 
     @Override
     public ApplicationStudentBasicDetailsGetDTO getStudentBasicDetails(int id) {
