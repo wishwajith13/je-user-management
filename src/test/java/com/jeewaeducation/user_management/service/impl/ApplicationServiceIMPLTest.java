@@ -2,10 +2,13 @@ package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationSaveDTO;
+import com.jeewaeducation.user_management.dto.application.ApplicationStudentBasicDetailsGetDTO;
 import com.jeewaeducation.user_management.dto.application.ApplicationUpdateDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import com.jeewaeducation.user_management.entity.Application;
+import com.jeewaeducation.user_management.entity.Branch;
 import com.jeewaeducation.user_management.entity.Reception;
+import com.jeewaeducation.user_management.entity.Student;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.ApplicationRepo;
 import com.jeewaeducation.user_management.repo.ReceptionRepo;
@@ -20,8 +23,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -73,16 +78,91 @@ public class ApplicationServiceIMPLTest {
 
     @Test
     public void saveApplication_whenAllDataIsValid_savesApplication() {
-        ApplicationSaveDTO applicationSaveDTO = mock(ApplicationSaveDTO.class);
-        Application application = mock(Application.class);
-        Reception reception = mock(Reception.class);
+        ApplicationSaveDTO applicationSaveDTO = new ApplicationSaveDTO(
+                new Date(),
+                "Application Title",
+                new Date(),
+                "Place of Birth",
+                20,
+                "Family Name",
+                "Given Name",
+                "male",
+                "Passport",
+                "Married",
+                new Date(),
+                2,
+                1234567890,
+                1234567890,
+                "email",
+                "postal address",
+                "school",
+                new Date(),
+                "OL Details",
+                new Date(),
+                "AL Details",
+                new Date(),
+                "Degree Details",
+                new Date(),
+                "Experience Details",
+                new Date(),
+                "IELTS Details",
+                "Preferred Area",
+                true,
+                "Country",
+                true,
+                "Refusal Details",
+                "Sponsor Relationship",
+                "Study Country",
+                "City",
+                "Method of Knowing",
+                false,
+                1
+        );
 
-        when(receptionRepo.findById(applicationSaveDTO.getReception()))
-                .thenReturn(Optional.of(reception));
+        Branch branch = new Branch();
+        branch.setBranchId(1);
+
+        Reception reception = new Reception();
+        reception.setReceptionId(1);
+        reception.setBranch(branch);
+
+        Application application = new Application();
+
         when(modelMapper.map(applicationSaveDTO, Application.class))
                 .thenReturn(application);
+        when(receptionRepo.findById(applicationSaveDTO.getReception()))
+                .thenReturn(Optional.of(reception));
         when(applicationRepo.existsById(application.getApplicationId()))
                 .thenReturn(false);
+
+        application.setReception(reception);
+
+        Student student = new Student();
+        student.setStudentRating("NA");
+        student.setStudentStatus("NA");
+        student.setBranchId(reception.getBranch());
+        student.setApplication(application);
+
+
+        when(studentRepo.save(student))
+                .thenReturn(student);
+
+        when(applicationRepo.save(application))
+                .thenReturn(application);
+
+        String result = applicationServiceIMPL.saveApplication(applicationSaveDTO);
+
+        assertEquals("Application ID: " + application.getApplicationId() + " and Student ID: " + student.getStudentId() + " Saved", result);
+
+        verify(modelMapper, times(1))
+                .map(applicationSaveDTO, Application.class);
+        verify(receptionRepo, times(1))
+                .findById(application.getReception().getReceptionId());
+        verify(applicationRepo, times(1))
+                .save(application);
+        verify(studentRepo, times(1))
+                .save(student);
+
     }
 
     @Test
@@ -211,6 +291,7 @@ public class ApplicationServiceIMPLTest {
                 "Study Country",
                 "City",
                 "Method of Knowing",
+                true,
                 1
         );
 
@@ -268,6 +349,7 @@ public class ApplicationServiceIMPLTest {
                 "Study Country",
                 "City",
                 "Method of Knowing",
+                true,
                 1
         );
 
@@ -332,6 +414,7 @@ public class ApplicationServiceIMPLTest {
                 "Study Country",
                 "City",
                 "Method of Knowing",
+                true,
                 11
         );
 
@@ -381,6 +464,7 @@ public class ApplicationServiceIMPLTest {
     @Test
     public void getStudentBasicDetails_whenApplicationNotFound_throwsNotFoundException() {
         int applicationId = 1;
+
         when(applicationRepo.findById(applicationId))
                 .thenReturn(Optional.empty());
 
@@ -393,6 +477,76 @@ public class ApplicationServiceIMPLTest {
                 .findById(applicationId);
         verify(modelMapper, never())
                 .map(any(), any());
+    }
+
+    @Test
+    public void getStudentBasicDetails_whenApplicationFound_returnsStudentBasicDetails() {
+        int applicationId = 1;
+        Application application = new Application();
+
+        application.setApplicationId(1);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+
+        when(applicationRepo.findById(applicationId))
+                .thenReturn(Optional.of(application));
+        when(modelMapper.map(application, ApplicationStudentBasicDetailsGetDTO.class))
+                .thenReturn(applicationStudentBasicDetailsGetDTO);
+
+        ApplicationStudentBasicDetailsGetDTO result = applicationServiceIMPL.getStudentBasicDetails(applicationId);
+
+        assertEquals(applicationStudentBasicDetailsGetDTO, result);
+    }
+
+    @Test
+    public void getAllStudentBasicDetails_whenNoApplicationsFound_throwsNotFoundException() {
+        when(applicationRepo.findAll())
+                .thenReturn(emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getAllStudentBasicDetails());
+
+        assertEquals("No applications found", exception.getMessage());
+
+        verify(applicationRepo, times(1))
+                .findAll();
+        verify(applicationMapper, never())
+                .entityListToDtoList(any());
+    }
+
+    @Test
+    public void getAllStudentBasicDetails_WhenApplicationsFound_returnsApplicationStudentBasicDetailsGetDTOList(){
+        Reception reception = mock(Reception.class);
+
+        ReceptionForApplicationDTO receptionDTO = new ReceptionForApplicationDTO();
+        receptionDTO.setReceptionId(reception.getReceptionId());
+
+        Application application = new Application();
+        application.setApplicationId(1);
+        application.setReception(reception);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
+        applicationStudentBasicDetailsGetDTO.setReception(receptionDTO);
+
+        List<Application> applications = List.of(application);
+
+        when(applicationRepo.findAll())
+                .thenReturn(applications);
+        when(applicationMapper.entityListToDtoList(applications))
+                .thenReturn(List.of(applicationStudentBasicDetailsGetDTO));
+
+        List<ApplicationStudentBasicDetailsGetDTO> result = applicationServiceIMPL.getAllStudentBasicDetails();
+
+        assertEquals(1, result.size());
+        assertEquals(applicationStudentBasicDetailsGetDTO, result.get(0));
+        assertEquals(applicationStudentBasicDetailsGetDTO.getApplicationId(), result.get(0).getApplicationId());
+        assertEquals(applicationStudentBasicDetailsGetDTO.getReception(), result.get(0).getReception());
+
+        verify(applicationRepo, times(1))
+                .findAll();
+        verify(applicationMapper, times(1))
+                .entityListToDtoList(applications);
     }
 
     private static Application getExistingApplication(int applicationId) {

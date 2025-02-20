@@ -37,21 +37,21 @@ public class ApplicationServiceIMPL implements ApplicationService {
 
             Reception reception = receptionRepo.findById(applicationSaveDTO.getReception())
                     .orElseThrow(() -> new NotFoundException("Reception not found with ID: " + applicationSaveDTO.getReception()));
-            application.setReception(reception);
 
             if (applicationRepo.existsById(application.getApplicationId())) {
                 throw new DuplicateKeyException("Application already exists with ID: " + application.getApplicationId());
             }
 
+            application.setReception(reception);
+
             Student student = new Student();
             student.setStudentRating("NA");
             student.setStudentStatus("NA");
-            student.setBranchId(reception.getBranch()); // Assign branch from reception
-            student.setApplication(application); // Link Student to Application
+            student.setBranchId(reception.getBranch());
+            student.setApplication(application);
 
             studentRepo.save(student);
 
-            //application.setStudent(savedStudent);
             Application savedApplication = applicationRepo.save(application);
 
             return "Application ID: " + savedApplication.getApplicationId() + " and Student ID: " + student.getStudentId() + " Saved";
@@ -83,8 +83,6 @@ public class ApplicationServiceIMPL implements ApplicationService {
                 new NotFoundException("Reception not found with ID: " + applicationUpdateDTO.getReception()));
         Application application = modelMapper.map(applicationUpdateDTO, Application.class);
         application.setReception(reception);
-//        applicationRepo.findById(application.getApplicationId()).orElseThrow(() ->
-//                new EntityNotFoundException("Application not found with ID: " + application.getApplicationId()));//TODO: exception handling
         applicationRepo.save(application);
         return application.getApplicationId() + "Updated";
     }
