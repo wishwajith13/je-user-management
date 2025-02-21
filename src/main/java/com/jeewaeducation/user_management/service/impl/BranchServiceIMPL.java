@@ -12,7 +12,6 @@ import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolatio
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.*;
 import com.jeewaeducation.user_management.service.BranchService;
-import com.jeewaeducation.user_management.utility.mappers.BranchMapper;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,7 @@ public class BranchServiceIMPL implements BranchService {
 
     private BranchRepo branchRepo;
     private ModelMapper modelMapper;
-    private BranchMapper branchMapper;
+//    private BranchMapper branchMapper;
     private CounselorRepo counselorRepo;
     private StudentRepo studentRepo;
     private ReceptionRepo receptionRepo;

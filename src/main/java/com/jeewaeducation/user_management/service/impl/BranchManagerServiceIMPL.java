@@ -14,9 +14,7 @@ import com.jeewaeducation.user_management.repo.BranchManagerRepo;
 import com.jeewaeducation.user_management.repo.BranchRepo;
 import com.jeewaeducation.user_management.service.BranchManagerService;
 import com.jeewaeducation.user_management.service.BranchService;
-import com.jeewaeducation.user_management.utility.mappers.BranchManagerMapper;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,17 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class BranchManagerServiceIMPL implements BranchManagerService {
-    @Autowired
     private BranchManagerRepo branchManagerRepo;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private BranchManagerMapper branchManagerMapper;
-    @Autowired
+//    private ModelMapper modelMapper;
     private BranchRepo branchRepo;
-    @Autowired
     private BranchService branchService;
+//    private BranchManagerMapper branchManagerMapper;
 
     @Override
     public String saveBranchManager(BranchManagerSaveDTO branchManagerSaveDTO) {

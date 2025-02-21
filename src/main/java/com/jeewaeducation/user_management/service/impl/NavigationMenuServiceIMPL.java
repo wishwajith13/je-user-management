@@ -5,8 +5,7 @@ import com.jeewaeducation.user_management.entity.MenuVisibleRole;
 import com.jeewaeducation.user_management.entity.NavMenu;
 import com.jeewaeducation.user_management.repo.NavigationMenuRepository;
 import com.jeewaeducation.user_management.service.NavigationMenuService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,16 +13,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class NavigationMenuServiceIMPL implements NavigationMenuService {
 
     private NavigationMenuRepository menuRepository;
-    private ModelMapper modelMapper;
-
-    @Autowired
-    public NavigationMenuServiceIMPL(NavigationMenuRepository menuRepository, ModelMapper modelMapper) {
-        this.menuRepository = menuRepository;
-        this.modelMapper = modelMapper;
-    }
+//    private ModelMapper modelMapper;
 
     @Override
     public List<NavigationMenuGetDTO> getAllNavigationMenu() {
