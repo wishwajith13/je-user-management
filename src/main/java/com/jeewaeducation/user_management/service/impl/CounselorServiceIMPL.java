@@ -53,15 +53,16 @@ public class CounselorServiceIMPL implements CounselorService {
 
     @Override
     public String updateCounselor(CounselorSaveDTO counselorSaveDTO, int counselorId) {
-        Branch branch = branchRepo.findById(counselorSaveDTO.getBranch()).orElseThrow(() -> new NotFoundException("Branch not found"));
+        Branch branch = branchRepo.findById(counselorSaveDTO.getBranch())
+                .orElseThrow(() -> new NotFoundException("Branch not found"));
+        counselorRepo.findById(counselorId).orElseThrow(() -> new NotFoundException("Counselor not found"));
         Counselor counselor = modelMapper.map(counselorSaveDTO, Counselor.class);
-        if(counselorRepo.existsById(counselorId)){
-            counselor.setCounselorId(counselorId);
-            counselor.setBranch(branch);
-            return counselorRepo.save(counselor)+"Counselor Updated";
-        }else{
-            throw new NotFoundException("Counselor Not Found");
-        }
+
+        counselor.setCounselorId(counselorId);
+        counselor.setBranch(branch);
+        counselorRepo.save(counselor);
+        return "Counselor Updated with ID: " + counselorId;
+
     }
 
     @Override
