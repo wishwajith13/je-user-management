@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class BranchGetDTO {
-
     private int id;
     private String branchName;
-
 }

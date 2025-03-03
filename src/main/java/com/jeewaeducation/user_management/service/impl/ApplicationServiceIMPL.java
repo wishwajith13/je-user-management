@@ -1,6 +1,7 @@
 package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.application.*;
+import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Reception;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -110,5 +112,43 @@ public class ApplicationServiceIMPL implements ApplicationService {
         return applicationMapper.entityListToDtoList(applications);
 
     }
+
+    @Override
+    public List<ApplicationStudentBasicDetailsGetDTO> getStudentBasicDetailsByReceptionId(int receptionId) {
+        Reception reception = receptionRepo.findById(receptionId).orElseThrow(() ->
+                new NotFoundException("Reception not found with ID: " + receptionId));
+        List<Application> applications = applicationRepo.findByReception(reception);
+        if (applications.isEmpty()) {
+            throw new NotFoundException("No applications found for reception ID: " + receptionId);
+        }
+        return applications.stream().map(application -> {
+            ApplicationStudentBasicDetailsGetDTO dto = new ApplicationStudentBasicDetailsGetDTO();
+            dto.setApplicationId(application.getApplicationId());
+            dto.setApplicationDate(application.getApplicationDate());
+            dto.setTitle(application.getTitle());
+            dto.setFamilyName(application.getFamilyName());
+            dto.setGivenName(application.getGivenName());
+            dto.setMobileContactNumber(application.getMobileContactNumber());
+            dto.setHomeContactNumber(application.getHomeContactNumber());
+            dto.setEmail(application.getEmail());
+            dto.setVerified(application.isVerified());
+
+            if (reception != null) {
+                ReceptionForApplicationDTO receptionDTO = new ReceptionForApplicationDTO();
+                receptionDTO.setReceptionId(reception.getReceptionId());
+                receptionDTO.setReceptionName(reception.getReceptionName());
+
+                BranchGetDTO branchDTO = new BranchGetDTO();
+                branchDTO.setId(reception.getBranch().getBranchId());
+                branchDTO.setBranchName(reception.getBranch().getBranchName());
+
+                receptionDTO.setBranch(branchDTO);
+                dto.setReception(receptionDTO);
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 
 }

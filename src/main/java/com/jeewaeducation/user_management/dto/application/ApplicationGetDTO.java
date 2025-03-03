@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,7 +15,7 @@ import java.util.Date;
 public class ApplicationGetDTO {
     private int applicationId;
     private Date applicationDate;
-    private String applicationTitle;
+    private String title;
     private Date dateOfBirth;
     private String placeOfBirth;
     private int age;
@@ -25,30 +26,45 @@ public class ApplicationGetDTO {
     private String relationshipStatus;
     private Date dateOfMarriage;
     private int numberOfChildren;
-    private int mobileContactNumber;
-    private int homeContactNumber;
+    private String mobileContactNumber;
+    private String homeContactNumber;
     private String email;
     private String postalAddress;
     private String schoolAttended;
-    private Date olExamYear;
+    private String olExamType;
+    private Date olExamStartYear;
+    private Date olExamEndYear;
     private String olExamDetails;
-    private Date alExamYear;
+    private String alExamType;
+    private Date alExamStartYear;
+    private Date alExamEndYear;
     private String alExamDetails;
-    private Date degreeYear;
+    private String degreeType;
+    private Date degreeStartYear;
+    private Date degreeEndYear;
     private String degreeDetails;
-    private Date experienceYear;
+    private String otherType;
+    private Date otherStartYear;
+    private Date otherEndYear;
+    private String otherDetails;
+    private String experienceType;
+    private Date experienceStartYear;
+    private Date experienceEndYear;
     private String experienceDetails;
-    private Date ieltsPteYear;
+    private String ieltsPteType;
+    private Date ieltsPteStartYear;
+    private Date ieltsPteEndYear;
     private String ieltsPteDetails;
     private String preferredAreaOfStudy;
     private boolean appliedForVisaBefore;
     private String countryVisaTypeApplied;
     private boolean visaRefusals;
     private String visaRefusalsDetails;
-    private String sponsorRelationship;
-    private String preferredStudyCountry;
-    private String preferredCity;
-    private String methodeOfKnowing;
+    private List<String> sponsorRelationship;
+    private List<String> preferredStudyCountry;
+    private String preferredStudyCountryOther;
+    private List<String> preferredCity;
+    private List<String> methodeOfKnowing;
     private boolean isVerified;
     private ReceptionForApplicationDTO reception;
 }
