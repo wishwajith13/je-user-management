@@ -62,6 +62,7 @@ public class ApplicationGetDTO {
     private String visaRefusalsDetails;
     private List<String> sponsorRelationship;
     private List<String> preferredStudyCountry;
+    private String preferredStudyCountryOther;
     private List<String> preferredCity;
     private List<String> methodeOfKnowing;
     private boolean isVerified;

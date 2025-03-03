@@ -118,6 +118,8 @@ public class Application {
     @Column(name = "preferred_study_country",nullable = false)
     @ElementCollection
     private List<String> preferredStudyCountry;
+    @Column(name = "preferred_study_country_other")
+    private String preferredStudyCountryOther;
     @Column(name = "preferred_city")
     @ElementCollection
     private List<String> preferredCity;
