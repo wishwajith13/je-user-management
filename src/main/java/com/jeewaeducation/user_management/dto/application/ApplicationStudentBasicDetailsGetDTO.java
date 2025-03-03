@@ -16,8 +16,8 @@ public class ApplicationStudentBasicDetailsGetDTO {
     private String title;
     private String familyName;
     private String givenName;
-    private int mobileContactNumber;
-    private int homeContactNumber;
+    private String mobileContactNumber;
+    private String homeContactNumber;
     private String email;
     private boolean isVerified;
     private ReceptionForApplicationDTO reception;

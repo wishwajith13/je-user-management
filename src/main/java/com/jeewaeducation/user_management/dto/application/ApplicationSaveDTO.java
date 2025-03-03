@@ -23,8 +23,8 @@ public class ApplicationSaveDTO {
     private String relationshipStatus;
     private Date dateOfMarriage;
     private int numberOfChildren;
-    private int mobileContactNumber;
-    private int homeContactNumber;
+    private String mobileContactNumber;
+    private String homeContactNumber;
     private String email;
     private String postalAddress;
     private String schoolAttended;

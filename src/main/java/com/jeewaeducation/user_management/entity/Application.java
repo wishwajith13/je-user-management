@@ -45,9 +45,9 @@ public class Application {
     @Column(name = "number_of_children",nullable = false)
     private int numberOfChildren;
     @Column(name = "mobile_contact_number",nullable = false)
-    private int mobileContactNumber;
+    private String mobileContactNumber;
     @Column(name = "home_contact_number", nullable = false)
-    private int homeContactNumber;
+    private String homeContactNumber;
     @Column(name = "email",nullable = false)
     private String email;
     @Column(name = "postal_address",nullable = false)
