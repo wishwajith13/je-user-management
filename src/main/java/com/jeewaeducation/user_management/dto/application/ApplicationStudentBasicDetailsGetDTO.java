@@ -13,8 +13,11 @@ import java.util.Date;
 public class ApplicationStudentBasicDetailsGetDTO {
     private int applicationId;
     private Date applicationDate;
+    private String title;
     private String familyName;
-    private int mobileContactNumber;
+    private String givenName;
+    private String mobileContactNumber;
+    private String homeContactNumber;
     private String email;
     private boolean isVerified;
     private ReceptionForApplicationDTO reception;
