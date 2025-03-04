@@ -18,5 +18,5 @@ public interface ReceptionMapper {
 
     List<ReceptionDTO> entitListToDtoList(List<Reception> receptions);
 
-    //Iterable<? extends Publisher<?>> toReception(ReceptionSaveDTO receptionSaveDTO);
+    Iterable<? extends Publisher<?>> toReception(ReceptionSaveDTO receptionSaveDTO);
 }
