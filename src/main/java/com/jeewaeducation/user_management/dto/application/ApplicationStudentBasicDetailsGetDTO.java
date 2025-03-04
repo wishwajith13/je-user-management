@@ -1,5 +1,6 @@
 package com.jeewaeducation.user_management.dto.application;
 
+import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,4 +22,7 @@ public class ApplicationStudentBasicDetailsGetDTO {
     private String email;
     private boolean isVerified;
     private ReceptionForApplicationDTO reception;
+    private BranchGetDTO branchId;
+    private int studentId;
+    private  int counselorId;
 }

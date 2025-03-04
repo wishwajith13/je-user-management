@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 public class ReceptionForApplicationDTO {
     private int receptionId;
     private String receptionName;
-    private BranchGetDTO branch;
 }

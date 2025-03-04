@@ -115,4 +115,13 @@ public class StudentServiceIMPL implements StudentService {
             return studentDTO;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public String setCounselor(int studentId, int counselorId) {
+        Student student = studentRepo.findById(studentId).orElseThrow(() -> new NotFoundException("Student not found"));
+        Counselor counselor = counselorRepo.findById(counselorId).orElseThrow(() -> new NotFoundException("Counselor not found"));
+        student.setCounselorId(counselor);
+        studentRepo.save(student);
+        return "Counselor set for student ID: " + studentId;
+    }
 }

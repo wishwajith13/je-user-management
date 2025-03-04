@@ -49,4 +49,11 @@ public class StudentController {
     public ResponseEntity<StandardResponse> getAllStudents() {
         return new ResponseEntity<>(new StandardResponse(200, "Success", studentService.getAllStudents()), HttpStatus.OK);
     }
+
+    @PutMapping(
+            path = {"/setCounselor/{studentId}/{counselorId}"}
+    )
+    public ResponseEntity<StandardResponse> setCounselor(@PathVariable int studentId, @PathVariable int counselorId) {
+        return new ResponseEntity<>(new StandardResponse(200, "Success", studentService.setCounselor(studentId, counselorId)), HttpStatus.OK);
+    }
 }

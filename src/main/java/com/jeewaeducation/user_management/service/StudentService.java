@@ -12,6 +12,8 @@ public interface StudentService {
 
     String updateStudent(StudentUpdateDTO studentSaveDTO, int studentId);
 
+    String setCounselor(int studentId, int counselor);
+
     String deleteStudent(int id);
 
     StudentDTO getStudent(int id);

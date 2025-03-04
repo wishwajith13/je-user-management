@@ -100,7 +100,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
     public ApplicationStudentBasicDetailsGetDTO getStudentBasicDetails(int id) {
         Application application = applicationRepo.findById(id).orElseThrow(() ->
                 new NotFoundException("Application not found with ID: " + id));
-        return modelMapper.map(application, ApplicationStudentBasicDetailsGetDTO.class);
+        return applicationMapper.toDto(application);
     }
 
     @Override
@@ -121,34 +121,10 @@ public class ApplicationServiceIMPL implements ApplicationService {
         if (applications.isEmpty()) {
             throw new NotFoundException("No applications found for reception ID: " + receptionId);
         }
-        return applications.stream().map(application -> {
-            ApplicationStudentBasicDetailsGetDTO dto = new ApplicationStudentBasicDetailsGetDTO();
-            dto.setApplicationId(application.getApplicationId());
-            dto.setApplicationDate(application.getApplicationDate());
-            dto.setTitle(application.getTitle());
-            dto.setFamilyName(application.getFamilyName());
-            dto.setGivenName(application.getGivenName());
-            dto.setMobileContactNumber(application.getMobileContactNumber());
-            dto.setHomeContactNumber(application.getHomeContactNumber());
-            dto.setEmail(application.getEmail());
-            dto.setVerified(application.isVerified());
 
-            if (reception != null) {
-                ReceptionForApplicationDTO receptionDTO = new ReceptionForApplicationDTO();
-                receptionDTO.setReceptionId(reception.getReceptionId());
-                receptionDTO.setReceptionName(reception.getReceptionName());
-
-                BranchGetDTO branchDTO = new BranchGetDTO();
-                branchDTO.setId(reception.getBranch().getBranchId());
-                branchDTO.setBranchName(reception.getBranch().getBranchName());
-
-                receptionDTO.setBranch(branchDTO);
-                dto.setReception(receptionDTO);
-            }
-
-            return dto;
-        }).collect(Collectors.toList());
+        return applications.stream()
+                .map(applicationMapper::toDto)
+                .collect(Collectors.toList());
     }
-
 
 }
