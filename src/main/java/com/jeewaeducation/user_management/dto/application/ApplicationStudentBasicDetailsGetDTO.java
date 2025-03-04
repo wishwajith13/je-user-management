@@ -2,6 +2,7 @@ package com.jeewaeducation.user_management.dto.application;
 
 import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
+import com.jeewaeducation.user_management.dto.student.StudentBasicDetailsGetDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,6 @@ public class ApplicationStudentBasicDetailsGetDTO {
     private boolean isVerified;
     private ReceptionForApplicationDTO reception;
     private BranchGetDTO branchId;
-    private int studentId;
+    private StudentBasicDetailsGetDTO student;
     private  int counselorId;
 }

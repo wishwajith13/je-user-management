@@ -63,6 +63,14 @@ public class ApplicationController {
         return new ResponseEntity<>(new StandardResponse(200, "Success", applicationStudentBasicDetailsGetDTO), HttpStatus.OK);
     }
 
+    @GetMapping(
+            path = {"/basic/counselor/{id}"}
+    )
+    private ResponseEntity<StandardResponse> getStudentBasicDetailsByCounselorId(@PathVariable int id) {
+        List<ApplicationStudentBasicDetailsGetDTO> applicationStudentBasicDetailsGetDTO = applicationService.getStudentBasicDetailsByCounselorId(id);
+        return new ResponseEntity<>(new StandardResponse(200, "Success", applicationStudentBasicDetailsGetDTO), HttpStatus.OK);
+    }
+
     @PutMapping
     public ResponseEntity<StandardResponse> updateApplication(@RequestBody ApplicationUpdateDTO applicationUpdateDTO) {
         String message = applicationService.updateApplication(applicationUpdateDTO);

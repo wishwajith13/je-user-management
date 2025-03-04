@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class StudentBasicDetailsGetDTO {
-    private String familyName;
-    private int mobileContactNumber;
-    private String email;
+    private int studentId;
+    private String studentRating;
+    private String studentStatus;
 }

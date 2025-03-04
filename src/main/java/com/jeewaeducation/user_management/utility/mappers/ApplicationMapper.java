@@ -12,7 +12,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ApplicationMapper {
-    @Mapping(source = "student.studentId", target = "studentId")
+    @Mapping(source = "student", target = "student")
     @Mapping(source = "student.counselorId", target = "counselorId")
     @Mapping(source = "student.branchId", target = "branchId")
     ApplicationStudentBasicDetailsGetDTO toDto(Application application);

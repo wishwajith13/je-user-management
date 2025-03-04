@@ -21,4 +21,6 @@ public interface ApplicationService {
     List<ApplicationStudentBasicDetailsGetDTO> getAllStudentBasicDetails();
 
     List<ApplicationStudentBasicDetailsGetDTO> getStudentBasicDetailsByReceptionId(int receptionId);
+
+    List<ApplicationStudentBasicDetailsGetDTO> getStudentBasicDetailsByCounselorId(int counselorId);
 }

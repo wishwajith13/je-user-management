@@ -67,4 +67,5 @@ public class ApplicationGetDTO {
     private List<String> methodeOfKnowing;
     private boolean isVerified;
     private ReceptionForApplicationDTO reception;
+    private int counselorId;
 }

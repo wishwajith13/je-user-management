@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @EnableJpaRepositories
 public interface StudentRepo extends JpaRepository<Student, Integer> {
@@ -16,4 +18,8 @@ public interface StudentRepo extends JpaRepository<Student, Integer> {
     boolean existsByCounselorId(Counselor counselorId);
 
     boolean existsByApplication(Application application);
+
+    Student findByApplication(Application application);
+
+    List<Student> findByCounselorId_CounselorId(int counselorIdCounselorId);
 }
