@@ -81,4 +81,11 @@ public class CounselorServiceIMPL implements CounselorService {
         return modelMapper.map(counselors, new TypeToken<List<CounselorGetDTO>>() {}.getType());
     }
 
+    @Override
+    public List<CounselorGetDTO> getCounselorsByBranchId(int branchId) {
+        Branch branch = branchRepo.findById(branchId).orElseThrow(() -> new NotFoundException("Branch not found"));
+        List<Counselor> counselors = counselorRepo.findByBranch(branch);
+        return modelMapper.map(counselors, new TypeToken<List<CounselorGetDTO>>() {}.getType());
+    }
+
 }

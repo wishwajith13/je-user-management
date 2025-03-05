@@ -1,5 +1,6 @@
 package com.jeewaeducation.user_management.controller;
 
+import com.jeewaeducation.user_management.dto.student.StudentDetailsUpdateDTo;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
 import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
 import com.jeewaeducation.user_management.service.StudentService;
@@ -48,5 +49,19 @@ public class StudentController {
     @GetMapping
     public ResponseEntity<StandardResponse> getAllStudents() {
         return new ResponseEntity<>(new StandardResponse(200, "Success", studentService.getAllStudents()), HttpStatus.OK);
+    }
+
+    @PutMapping(
+            path = {"/setCounselor/{studentId}/{counselorId}"}
+    )
+    public ResponseEntity<StandardResponse> setCounselor(@PathVariable int studentId, @PathVariable int counselorId) {
+        return new ResponseEntity<>(new StandardResponse(200, "Success", studentService.setCounselor(studentId, counselorId)), HttpStatus.OK);
+    }
+
+    @PutMapping(
+            path = {"/updateStudentDetails/{studentId}"}
+    )
+    public ResponseEntity<StandardResponse> updateStudentDetails(@PathVariable int studentId, @RequestBody StudentDetailsUpdateDTo studentDetailsUpdateDTo) {
+        return new ResponseEntity<>(new StandardResponse(200, "Success", studentService.updateStudentDetails(studentId, studentDetailsUpdateDTo)), HttpStatus.OK);
     }
 }

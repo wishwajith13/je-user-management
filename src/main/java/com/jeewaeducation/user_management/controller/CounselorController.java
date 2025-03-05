@@ -34,6 +34,11 @@ public class CounselorController {
         return new ResponseEntity<>(new StandardResponse(200,"success",counselorService.getAllCounselors()), HttpStatus.OK);
     }
 
+    @GetMapping("/getCounselorByBranch/{branchId}")
+    public ResponseEntity<StandardResponse> getCounselorsByBranchId(@PathVariable int branchId){
+        return new ResponseEntity<>(new StandardResponse(200,"success",counselorService.getCounselorsByBranchId(branchId)), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<StandardResponse> deleteCounselor(@PathVariable int id){
         String message = counselorService.deleteCounselor(id);

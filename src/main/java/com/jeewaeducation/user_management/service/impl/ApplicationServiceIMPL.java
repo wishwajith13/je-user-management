@@ -1,7 +1,6 @@
 package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.application.*;
-import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Reception;
@@ -44,8 +43,8 @@ public class ApplicationServiceIMPL implements ApplicationService {
             application.setReception(reception);
 
             Student student = new Student();
-            student.setStudentRating("NA");
-            student.setStudentStatus("NA");
+            student.setStudentRating("Not Rated");
+            student.setStudentStatus("New");
             student.setBranchId(reception.getBranch());
             student.setApplication(application);
 
@@ -67,10 +66,13 @@ public class ApplicationServiceIMPL implements ApplicationService {
     @Override
     public ApplicationGetDTO getApplication(int applicationId) {
         Application application = applicationRepo.findById(applicationId).orElseThrow(() -> new NotFoundException("Application not found with ID: " + applicationId));
+        Student student = studentRepo.findByApplication(application);
+        int counselorId = (student.getCounselorId() != null) ? student.getCounselorId().getCounselorId() : 0;
         ApplicationGetDTO applicationGetDTO = modelMapper.map(application, ApplicationGetDTO.class);
         Reception reception = application.getReception();
         ReceptionForApplicationDTO receptionDTO = modelMapper.map(reception, ReceptionForApplicationDTO.class);//only got id and name
         applicationGetDTO.setReception(receptionDTO);
+        applicationGetDTO.setCounselorId(counselorId);
         return applicationGetDTO;
     }
 
@@ -100,7 +102,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
     public ApplicationStudentBasicDetailsGetDTO getStudentBasicDetails(int id) {
         Application application = applicationRepo.findById(id).orElseThrow(() ->
                 new NotFoundException("Application not found with ID: " + id));
-        return modelMapper.map(application, ApplicationStudentBasicDetailsGetDTO.class);
+        return applicationMapper.toDto(application);
     }
 
     @Override
@@ -121,34 +123,27 @@ public class ApplicationServiceIMPL implements ApplicationService {
         if (applications.isEmpty()) {
             throw new NotFoundException("No applications found for reception ID: " + receptionId);
         }
-        return applications.stream().map(application -> {
-            ApplicationStudentBasicDetailsGetDTO dto = new ApplicationStudentBasicDetailsGetDTO();
-            dto.setApplicationId(application.getApplicationId());
-            dto.setApplicationDate(application.getApplicationDate());
-            dto.setTitle(application.getTitle());
-            dto.setFamilyName(application.getFamilyName());
-            dto.setGivenName(application.getGivenName());
-            dto.setMobileContactNumber(application.getMobileContactNumber());
-            dto.setHomeContactNumber(application.getHomeContactNumber());
-            dto.setEmail(application.getEmail());
-            dto.setVerified(application.isVerified());
 
-            if (reception != null) {
-                ReceptionForApplicationDTO receptionDTO = new ReceptionForApplicationDTO();
-                receptionDTO.setReceptionId(reception.getReceptionId());
-                receptionDTO.setReceptionName(reception.getReceptionName());
-
-                BranchGetDTO branchDTO = new BranchGetDTO();
-                branchDTO.setId(reception.getBranch().getBranchId());
-                branchDTO.setBranchName(reception.getBranch().getBranchName());
-
-                receptionDTO.setBranch(branchDTO);
-                dto.setReception(receptionDTO);
-            }
-
-            return dto;
-        }).collect(Collectors.toList());
+        return applications.stream()
+                .map(applicationMapper::toDto)
+                .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ApplicationStudentBasicDetailsGetDTO> getStudentBasicDetailsByCounselorId(int counselorId) {
+        List<Student> students = studentRepo.findByCounselorId_CounselorId(counselorId);
+
+        List<Application> applications = students.stream()
+                .map(Student::getApplication)
+                .toList();
+
+        if (applications.isEmpty()) {
+            throw new NotFoundException("No applications found for counselor ID: " + counselorId);
+        }
+
+        return applications.stream()
+                .map(applicationMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
 }
