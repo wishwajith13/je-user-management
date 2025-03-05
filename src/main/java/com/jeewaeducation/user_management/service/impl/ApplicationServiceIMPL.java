@@ -1,7 +1,6 @@
 package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.application.*;
-import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Reception;
@@ -44,8 +43,8 @@ public class ApplicationServiceIMPL implements ApplicationService {
             application.setReception(reception);
 
             Student student = new Student();
-            student.setStudentRating("NA");
-            student.setStudentStatus("NA");
+            student.setStudentRating("Not Rated");
+            student.setStudentStatus("New");
             student.setBranchId(reception.getBranch());
             student.setApplication(application);
 

@@ -5,6 +5,7 @@ import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.counselor.CounselorForStudentDTO;
 import com.jeewaeducation.user_management.dto.student.StudentDTO;
+import com.jeewaeducation.user_management.dto.student.StudentDetailsUpdateDTo;
 import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
 import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
 import com.jeewaeducation.user_management.entity.Application;
@@ -72,6 +73,16 @@ public class StudentServiceIMPL implements StudentService {
         student.setStudentStatus(studentUpdateDTO.getStudentStatus());
         student.setCounselorId(counselor);
         student.setBranchId(branch);
+        studentRepo.save(student);
+        return student.getStudentId() + " Updated";
+    }
+
+    @Override
+    public String updateStudentDetails(int studentId, StudentDetailsUpdateDTo studentDetailsUpdateDTo) {
+        Student student = studentRepo.findById(studentId)
+                .orElseThrow(() -> new NotFoundException("Student not found"));
+        student.setStudentRating(studentDetailsUpdateDTo.getStudentRating());
+        student.setStudentStatus(studentDetailsUpdateDTo.getStudentStatus());
         studentRepo.save(student);
         return student.getStudentId() + " Updated";
     }
