@@ -51,6 +51,13 @@ public class StudentController {
         return new ResponseEntity<>(new StandardResponse(200, "Success", studentService.getAllStudents()), HttpStatus.OK);
     }
 
+    @GetMapping(
+            path = {"/basic/{id}"}
+    )
+    public ResponseEntity<StandardResponse> getStudentBasicDetails(@PathVariable int id) {
+        return new ResponseEntity<>(new StandardResponse(200, "Success", studentService.getStudentBasicDetails(id)), HttpStatus.OK);
+    }
+
     @PutMapping(
             path = {"/setCounselor/{studentId}/{counselorId}"}
     )

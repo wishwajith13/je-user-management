@@ -1,9 +1,6 @@
 package com.jeewaeducation.user_management.service;
 
-import com.jeewaeducation.user_management.dto.student.StudentDTO;
-import com.jeewaeducation.user_management.dto.student.StudentDetailsUpdateDTo;
-import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
-import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
+import com.jeewaeducation.user_management.dto.student.*;
 
 import java.util.List;
 
@@ -20,6 +17,8 @@ public interface StudentService {
     String deleteStudent(int id);
 
     StudentDTO getStudent(int id);
+
+    StudentGetDTO getStudentBasicDetails(int id);
 
     List<StudentDTO> getAllStudents();
 }

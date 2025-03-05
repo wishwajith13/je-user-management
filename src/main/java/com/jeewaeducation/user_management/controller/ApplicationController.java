@@ -56,6 +56,14 @@ public class ApplicationController {
     }
 
     @GetMapping(
+            path = {"/basic/student/{id}"}
+    )
+    private ResponseEntity<StandardResponse> getStudentBasicDetailsByStudentId(@PathVariable int id) {
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = applicationService.getStudentBasicDetailsByStudentId(id);
+        return new ResponseEntity<>(new StandardResponse(200, "Success", applicationStudentBasicDetailsGetDTO), HttpStatus.OK);
+    }
+
+    @GetMapping(
             path = {"/basic/reception/{id}"}
     )
     private ResponseEntity<StandardResponse> getStudentBasicDetailsByReceptionId(@PathVariable int id) { 

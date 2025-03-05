@@ -106,6 +106,14 @@ public class ApplicationServiceIMPL implements ApplicationService {
     }
 
     @Override
+    public ApplicationStudentBasicDetailsGetDTO getStudentBasicDetailsByStudentId(int studentId) {
+        Student student = studentRepo.findById(studentId).orElseThrow(() ->
+                new NotFoundException("Student not found with ID: " + studentId));
+        Application application = student.getApplication();
+        return applicationMapper.toDto(application);
+    }
+
+    @Override
     public List<ApplicationStudentBasicDetailsGetDTO> getAllStudentBasicDetails() {
         List<Application> applications = applicationRepo.findAll();
         if (applications.isEmpty()) {
