@@ -14,7 +14,7 @@ import java.util.List;
 public class ApplicationSaveDTO {
     @NotNull(message = "Application date is required")
     private Date applicationDate;
-    @NotBlank(message = "Title is required")
+    @NotEmpty(message = "Title is required")
     private String title;
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
@@ -27,16 +27,16 @@ public class ApplicationSaveDTO {
     private String familyName;
     @Size(min = 2, message = "Given Name must contain at least 2 characters")
     private String givenName;
-    @NotBlank(message = "Gender is required")
+    @NotEmpty(message = "Gender is required")
     private String gender;
     @Size(min = 2, message = "Passport or Nic must contain at least 2 characters")
     private String passportOrNic;
-    @NotBlank(message = "Relationship status is required")
+    @NotEmpty(message = "Relationship status is required")
     private String relationshipStatus;
     private Date dateOfMarriage;
     @Min(value = 0, message = "Number of children must be a positive number")
     private int numberOfChildren;
-    @NotBlank(message = "Mobile contact number is required")
+    @NotEmpty(message = "Mobile contact number is required")
     @Pattern(regexp = "^[0-9]{10}$", message = "Mobile contact number must be 10 digits")
     private String mobileContactNumber;
     @Pattern(regexp = "^[0-9]{10}$", message = "Home contact number must be 10 digits")
@@ -76,13 +76,13 @@ public class ApplicationSaveDTO {
     private String countryVisaTypeApplied;
     private boolean visaRefusals;
     private String visaRefusalsDetails;
-    @NotBlank(message = "Sponsor Relationship is required")
+    @NotEmpty(message = "Sponsor Relationship is required")
     private List<String> sponsorRelationship;
-    @NotBlank(message = "Preferred Study Country is required")
+    @NotEmpty(message = "Preferred Study Country is required")
     private List<String> preferredStudyCountry;
     private String preferredStudyCountryOther;
     private List<String> preferredCity;
-    @NotBlank(message = "Methode Of Knowing is required")
+    @NotEmpty(message = "Methode Of Knowing is required")
     private List<String> methodeOfKnowing;
     private boolean isVerified;
     @Min(value = 0, message = "Reception must be a positive number")

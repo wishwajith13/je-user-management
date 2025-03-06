@@ -16,21 +16,21 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<StandardResponse> handleNotFoundException(NotFoundException exception) {
-        return new ResponseEntity<StandardResponse>(
+        return new ResponseEntity<>(
                 new StandardResponse(404, "Not Found", exception.getMessage()), HttpStatus.NOT_FOUND
         );
     }
 
     @ExceptionHandler(AlreadyAssignedException.class)
     public ResponseEntity<StandardResponse> handleAlreadyAssignedException(AlreadyAssignedException exception) {
-        return new ResponseEntity<StandardResponse>(
+        return new ResponseEntity<>(
                 new StandardResponse(408, "Conflict", exception.getMessage()), HttpStatus.CONFLICT
         );
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<StandardResponse> handleDuplicateKeyException(DuplicateKeyException exception) {
-        return new ResponseEntity<StandardResponse>(
+        return new ResponseEntity<>(
                 new StandardResponse(404, "Not Found", exception.getMessage()), HttpStatus.NOT_FOUND
         );
     }
@@ -49,15 +49,11 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             errorMap.put(error.getField(), error.getDefaultMessage());
         });
-
-        // Create a StandardResponse object
         StandardResponse response = new StandardResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation Error",
                 errorMap
         );
-
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-
 }

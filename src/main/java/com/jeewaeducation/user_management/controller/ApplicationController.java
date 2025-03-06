@@ -19,7 +19,7 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     @PostMapping
-    public ResponseEntity<StandardResponse> saveApplication(@RequestBody @Valid ApplicationSaveDTO applicationSaveDTO) {
+    public ResponseEntity<StandardResponse> saveApplication(@Valid @RequestBody ApplicationSaveDTO applicationSaveDTO) {
         String message = applicationService.saveApplication(applicationSaveDTO);
         return new ResponseEntity<>(new StandardResponse(201, "Success", message), HttpStatus.CREATED);
     }
@@ -73,7 +73,7 @@ public class ApplicationController {
     }
 
     @PutMapping
-    public ResponseEntity<StandardResponse> updateApplication(@RequestBody ApplicationUpdateDTO applicationUpdateDTO) {
+    public ResponseEntity<StandardResponse> updateApplication(@Valid @RequestBody ApplicationUpdateDTO applicationUpdateDTO) {
         String message = applicationService.updateApplication(applicationUpdateDTO);
         return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
