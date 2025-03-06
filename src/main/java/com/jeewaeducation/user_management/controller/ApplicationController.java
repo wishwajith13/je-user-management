@@ -3,6 +3,7 @@ package com.jeewaeducation.user_management.controller;
 import com.jeewaeducation.user_management.dto.application.*;
 import com.jeewaeducation.user_management.service.ApplicationService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     @PostMapping
-    public ResponseEntity<StandardResponse> saveApplication(@RequestBody ApplicationSaveDTO applicationSaveDTO) {
+    public ResponseEntity<StandardResponse> saveApplication(@RequestBody @Valid ApplicationSaveDTO applicationSaveDTO) {
         String message = applicationService.saveApplication(applicationSaveDTO);
         return new ResponseEntity<>(new StandardResponse(201, "Success", message), HttpStatus.CREATED);
     }
