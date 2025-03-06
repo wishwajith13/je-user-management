@@ -4,10 +4,7 @@ package com.jeewaeducation.user_management.service.impl;
 import com.jeewaeducation.user_management.dto.application.ApplicationGetDTO;
 import com.jeewaeducation.user_management.dto.branch.BranchGetDTO;
 import com.jeewaeducation.user_management.dto.counselor.CounselorForStudentDTO;
-import com.jeewaeducation.user_management.dto.student.StudentDTO;
-import com.jeewaeducation.user_management.dto.student.StudentDetailsUpdateDTo;
-import com.jeewaeducation.user_management.dto.student.StudentSaveDTO;
-import com.jeewaeducation.user_management.dto.student.StudentUpdateDTO;
+import com.jeewaeducation.user_management.dto.student.*;
 import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Branch;
 import com.jeewaeducation.user_management.entity.Counselor;
@@ -104,6 +101,24 @@ public class StudentServiceIMPL implements StudentService {
         });
 
         return modelMapper.map(student, StudentDTO.class);
+    }
+
+    @Override
+    public StudentGetDTO getStudentBasicDetails(int id) {
+        Student student = studentRepo.findById(id).orElseThrow(() -> new NotFoundException("Student not found"));
+        StudentGetDTO studentGetDTO = modelMapper.map(student, StudentGetDTO.class);
+
+        if (student.getApplication() != null) {
+            studentGetDTO.setApplicationId(student.getApplication().getApplicationId());
+            studentGetDTO.setTitle(student.getApplication().getTitle());
+            studentGetDTO.setGivenName(student.getApplication().getGivenName());
+            studentGetDTO.setFamilyName(student.getApplication().getFamilyName());
+            studentGetDTO.setEmail(student.getApplication().getEmail());
+            studentGetDTO.setMobileContactNumber(student.getApplication().getMobileContactNumber());
+            studentGetDTO.setHomeContactNumber(student.getApplication().getHomeContactNumber());
+        }
+
+        return studentGetDTO;
     }
 
     @Override
