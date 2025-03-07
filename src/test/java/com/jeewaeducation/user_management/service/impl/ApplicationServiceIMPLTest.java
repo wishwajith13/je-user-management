@@ -6,6 +6,7 @@ import com.jeewaeducation.user_management.entity.*;
 import com.jeewaeducation.user_management.exception.DuplicateKeyException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.ApplicationRepo;
+import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.ReceptionRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.utility.mappers.ApplicationMapper;
@@ -39,6 +40,8 @@ public class ApplicationServiceIMPLTest {
     private ApplicationMapper applicationMapper;
     @Mock
     private StudentRepo studentRepo;
+    @Mock
+    private CounselorRepo counselorRepo;
     @InjectMocks
     private ApplicationServiceIMPL applicationServiceIMPL;
 
@@ -617,12 +620,17 @@ public class ApplicationServiceIMPLTest {
 
         when(applicationRepo.findById(applicationId))
                 .thenReturn(Optional.of(application));
-        when(modelMapper.map(application, ApplicationStudentBasicDetailsGetDTO.class))
+        when(applicationMapper.toDto(application))
                 .thenReturn(applicationStudentBasicDetailsGetDTO);
 
         ApplicationStudentBasicDetailsGetDTO result = applicationServiceIMPL.getStudentBasicDetails(applicationId);
 
         assertEquals(applicationStudentBasicDetailsGetDTO, result);
+
+        verify(applicationRepo, times(1))
+                .findById(applicationId);
+        verify(applicationMapper, times(1))
+                .toDto(application);
     }
 
     @Test
@@ -676,6 +684,203 @@ public class ApplicationServiceIMPLTest {
                 .entityListToDtoList(applications);
     }
 
+    @Test
+    public void getStudentBasicDetailsByStudentId_whenStudentNotFound_throwsNotFoundException() {
+        int studentId = 1;
+        when(studentRepo.findById(studentId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByStudentId(studentId));
+
+        assertEquals("Student not found with ID: " + studentId, exception.getMessage());
+
+        verify(studentRepo, times(1))
+                .findById(studentId);
+        verify(applicationMapper, never())
+                .toDto(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByStudentId_whenStudentFound_returnsStudentBasicDetails() {
+        int studentId = 1;
+        Student student = new Student();
+        student.setStudentId(studentId);
+
+        Application application = new Application();
+        application.setApplicationId(1);
+
+        student.setApplication(application);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
+
+        when(studentRepo.findById(studentId))
+                .thenReturn(Optional.of(student));
+        when(applicationMapper.toDto(application))
+                .thenReturn(applicationStudentBasicDetailsGetDTO);
+
+        ApplicationStudentBasicDetailsGetDTO result = applicationServiceIMPL.getStudentBasicDetailsByStudentId(studentId);
+
+        assertEquals(applicationStudentBasicDetailsGetDTO, result);
+
+        verify(studentRepo, times(1))
+                .findById(studentId);
+        verify(applicationMapper, times(1))
+                .toDto(application);
+    }
+
+    @Test
+    public void getStudentBasicDetailsByReceptionId_whenReceptionNotFound_throwsNotFoundException() {
+        int receptionId = 1;
+        when(receptionRepo.findById(receptionId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByReceptionId(receptionId));
+
+        assertEquals("Reception not found with ID: " + receptionId, exception.getMessage());
+
+        verify(receptionRepo, times(1))
+                .findById(receptionId);
+        verify(applicationRepo, never())
+                .findByReception(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByReceptionId_whenNoApplicationsFound_throwsNotFoundException() {
+        int receptionId = 1;
+        Reception reception = new Reception();
+        reception.setReceptionId(receptionId);
+
+        when(receptionRepo.findById(receptionId))
+                .thenReturn(Optional.of(reception));
+        when(applicationRepo.findByReception(reception))
+                .thenReturn(emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByReceptionId(receptionId));
+
+        assertEquals("No applications found for reception ID: " + receptionId, exception.getMessage());
+
+        verify(receptionRepo, times(1))
+                .findById(receptionId);
+        verify(applicationRepo, times(1))
+                .findByReception(reception);
+        verify(applicationMapper, never())
+                .toDto(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByReceptionId_whenApplicationsFound_returnsStudentBasicDetails() {
+        int receptionId = 1;
+        Reception reception = new Reception();
+        reception.setReceptionId(receptionId);
+
+        Application application = new Application();
+        application.setApplicationId(1);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
+
+        when(receptionRepo.findById(receptionId))
+                .thenReturn(Optional.of(reception));
+        when(applicationRepo.findByReception(reception))
+                .thenReturn(List.of(application));
+        when(applicationMapper.toDto(application))
+                .thenReturn(applicationStudentBasicDetailsGetDTO);
+
+        List<ApplicationStudentBasicDetailsGetDTO> result = applicationServiceIMPL.getStudentBasicDetailsByReceptionId(receptionId);
+
+        assertEquals(1, result.size());
+        assertEquals(applicationStudentBasicDetailsGetDTO, result.get(0));
+
+        verify(receptionRepo, times(1))
+                .findById(receptionId);
+        verify(applicationRepo, times(1))
+                .findByReception(reception);
+        verify(applicationMapper, times(1))
+                .toDto(application);
+    }
+
+    @Test
+    public void getStudentBasicDetailsByCounselorId_whenCounselorNotFound_throwsNotFoundException() {
+        int counselorId = 1;
+        when(counselorRepo.findById(counselorId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByCounselorId(counselorId));
+
+        assertEquals("Counselor not found with ID: " + counselorId, exception.getMessage());
+
+        verify(counselorRepo, times(1))
+                .findById(counselorId);
+        verify(studentRepo, never())
+                .findByCounselorId(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByCounselorId_whenNoStudentsFound_throwsNotFoundException() {
+        int counselorId = 1;
+        Counselor counselor = new Counselor();
+        counselor.setCounselorId(counselorId);
+
+        when(counselorRepo.findById(counselorId))
+                .thenReturn(Optional.of(counselor));
+        when(studentRepo.findByCounselorId(counselor))
+                .thenReturn(emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByCounselorId(counselorId));
+
+        assertEquals("No students found for counselor ID: " + counselorId, exception.getMessage());
+
+        verify(counselorRepo, times(1))
+                .findById(counselorId);
+        verify(studentRepo, times(1))
+                .findByCounselorId(counselor);
+        verify(applicationMapper, never())
+                .toDto(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByCounselorId_whenStudentsFound_returnsStudentBasicDetails() {
+        int counselorId = 1;
+        Counselor counselor = new Counselor();
+        counselor.setCounselorId(counselorId);
+
+        Student student = new Student();
+        student.setStudentId(1);
+        student.setCounselorId(counselor);
+
+        Application application = new Application();
+        application.setApplicationId(1);
+        student.setApplication(application);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
+
+        when(counselorRepo.findById(counselorId))
+                .thenReturn(Optional.of(counselor));
+        when(studentRepo.findByCounselorId(counselor))
+                .thenReturn(List.of(student));
+
+        when(applicationMapper.toDto(application))
+                .thenReturn(applicationStudentBasicDetailsGetDTO);
+
+        List<ApplicationStudentBasicDetailsGetDTO> result = applicationServiceIMPL.getStudentBasicDetailsByCounselorId(counselorId);
+
+        assertEquals(1, result.size());
+        assertEquals(applicationStudentBasicDetailsGetDTO, result.get(0));
+
+        verify(counselorRepo, times(1))
+                .findById(counselorId);
+        verify(studentRepo, times(1))
+                .findByCounselorId(counselor);
+        verify(applicationMapper, times(1))
+                .toDto(application);
+    }
 
 
     private static Application getExistingApplication(int applicationId) {
