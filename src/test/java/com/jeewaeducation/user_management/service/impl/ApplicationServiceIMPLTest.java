@@ -2,12 +2,11 @@ package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.application.*;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
-import com.jeewaeducation.user_management.entity.Application;
-import com.jeewaeducation.user_management.entity.Branch;
-import com.jeewaeducation.user_management.entity.Reception;
-import com.jeewaeducation.user_management.entity.Student;
+import com.jeewaeducation.user_management.entity.*;
+import com.jeewaeducation.user_management.exception.DuplicateKeyException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.ApplicationRepo;
+import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.ReceptionRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.utility.mappers.ApplicationMapper;
@@ -19,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +40,18 @@ public class ApplicationServiceIMPLTest {
     private ApplicationMapper applicationMapper;
     @Mock
     private StudentRepo studentRepo;
+    @Mock
+    private CounselorRepo counselorRepo;
     @InjectMocks
     private ApplicationServiceIMPL applicationServiceIMPL;
 
     @Test
     public void saveApplication_whenReceptionNotFound_throwsNotFoundException() {
         ApplicationSaveDTO applicationSaveDTO = mock(ApplicationSaveDTO.class);
+        Application application = new Application();
+
+        when(modelMapper.map(applicationSaveDTO, Application.class))
+                .thenReturn(application);
         when(receptionRepo.findById(applicationSaveDTO.getReception()))
                 .thenReturn(Optional.empty());
 
@@ -55,6 +61,37 @@ public class ApplicationServiceIMPLTest {
         assertEquals("Reception not found with ID: " + applicationSaveDTO.getReception(), exception.getMessage());
 
         verify(receptionRepo, times(1)).findById(applicationSaveDTO.getReception());
+    }
+
+    @Test
+    public void saveApplication_whenApplicationAlreadyExists_throwsDuplicateKeyException() {
+        ApplicationSaveDTO applicationSaveDTO = mock(ApplicationSaveDTO.class);
+        Application application = new Application();
+
+        Branch branch = new Branch();
+        branch.setBranchId(1);
+
+        Reception reception = new Reception();
+        reception.setReceptionId(1);
+        reception.setBranch(branch);
+
+
+        when(modelMapper.map(applicationSaveDTO, Application.class))
+                .thenReturn(application);
+        when(receptionRepo.findById(applicationSaveDTO.getReception()))
+                .thenReturn(Optional.of(reception));
+        when(applicationRepo.existsById(application.getApplicationId()))
+                .thenReturn(true);
+
+        DuplicateKeyException exception = assertThrows(DuplicateKeyException.class,
+                () -> applicationServiceIMPL.saveApplication(applicationSaveDTO));
+
+        assertEquals("Application already exists with ID: " + application.getApplicationId(), exception.getMessage());
+
+        verify(applicationRepo, times(1))
+                .existsById(application.getApplicationId());
+        verify(modelMapper, times(1))
+                .map(applicationSaveDTO, Application.class);
     }
 
     @Test
@@ -72,19 +109,33 @@ public class ApplicationServiceIMPLTest {
                 "Married",
                 new Date(),
                 2,
-                1234567890,
-                1234567890,
+                "1234567890",
+                "1234567890",
                 "email",
                 "postal address",
                 "school",
+                "olExamType",
+                new Date(),
                 new Date(),
                 "OL Details",
+                "AL Exam Type",
+                new Date(),
                 new Date(),
                 "AL Details",
+                "Degree Type",
+                new Date(),
                 new Date(),
                 "Degree Details",
+                "Other Type",
+                new Date(),
+                new Date(),
+                "Other Details",
+                "Experience Type",
+                new Date(),
                 new Date(),
                 "Experience Details",
+                "IELTS Type",
+                new Date(),
                 new Date(),
                 "IELTS Details",
                 "Preferred Area",
@@ -92,10 +143,11 @@ public class ApplicationServiceIMPLTest {
                 "Country",
                 true,
                 "Refusal Details",
-                "Sponsor Relationship",
-                "Study Country",
-                "City",
-                "Method of Knowing",
+                List.of("Sponsor Relationship"),
+                List.of("Study Country"),
+                "Preferred Study Country Other",
+                List.of("City"),
+                List.of("Method of Knowing"),
                 false,
                 1
         );
@@ -119,8 +171,8 @@ public class ApplicationServiceIMPLTest {
         application.setReception(reception);
 
         Student student = new Student();
-        student.setStudentRating("NA");
-        student.setStudentStatus("NA");
+        student.setStudentRating("Not Rated");
+        student.setStudentStatus("New");
         student.setBranchId(reception.getBranch());
         student.setApplication(application);
 
@@ -162,7 +214,7 @@ public class ApplicationServiceIMPLTest {
     }
 
     @Test
-    public  void deleteApplication_whenApplicationFound_deletesApplication() {
+    public void deleteApplication_whenApplicationFound_deletesApplication() {
         int applicationId = 1;
         Application application = mock(Application.class);
         when(applicationRepo.findById(applicationId))
@@ -200,12 +252,17 @@ public class ApplicationServiceIMPLTest {
     @Test
     public void getApplication_whenApplicationFound_returnsApplicationGetDTO() {
         Reception reception = mock(Reception.class);
+        Counselor counselor = mock(Counselor.class);
 
         ReceptionForApplicationDTO receptionDTO = new ReceptionForApplicationDTO();
         receptionDTO.setReceptionId(reception.getReceptionId());
 
         Application application = new Application();
         application.setApplicationId(1);
+
+        Student student = new Student();
+        student.setApplication(application);
+        student.setCounselorId(counselor);
 
         application.setReception(reception);
 
@@ -215,10 +272,12 @@ public class ApplicationServiceIMPLTest {
 
         when(applicationRepo.findById(1))
                 .thenReturn(Optional.of(application));
-        when(modelMapper.map(reception, ReceptionForApplicationDTO.class))
-                .thenReturn(receptionDTO);
+        when(studentRepo.findByApplication(application))
+                .thenReturn(student);
         when(modelMapper.map(application, ApplicationGetDTO.class))
                 .thenReturn(applicationGetDTO);
+        when(modelMapper.map(reception, ReceptionForApplicationDTO.class))
+                .thenReturn(receptionDTO);
 
         ApplicationGetDTO result = applicationServiceIMPL.getApplication(1);
 
@@ -234,6 +293,7 @@ public class ApplicationServiceIMPLTest {
     @Test
     public void updateApplication_whenApplicationNotFound_throwsNotFoundException() {
         int applicationId = 1;
+
         ApplicationUpdateDTO applicationUpdateDTO = new ApplicationUpdateDTO(
                 applicationId,
                 new Date(),
@@ -248,30 +308,45 @@ public class ApplicationServiceIMPLTest {
                 "Married",
                 new Date(),
                 2,
-                1234567890,
-                1234567890,
-                "email",
+                "1234567890",
+                "1234567890",
+                "email@example.com",
                 "postal address",
                 "school",
+                "OL Exam Type",
+                new Date(),
                 new Date(),
                 "OL Details",
+                "AL Exam Type",
+                new Date(),
                 new Date(),
                 "AL Details",
+                "Degree Type",
+                new Date(),
                 new Date(),
                 "Degree Details",
+                "Other Type",
+                new Date(),
+                new Date(),
+                "Other Details",
+                "Experience Type",
+                new Date(),
                 new Date(),
                 "Experience Details",
+                "IELTS Type",
+                new Date(),
                 new Date(),
                 "IELTS Details",
                 "Preferred Area",
                 true,
-                "Country",
+                "Country Visa Type",
                 true,
                 "Refusal Details",
-                "Sponsor Relationship",
-                "Study Country",
-                "City",
-                "Method of Knowing",
+                Arrays.asList("Parent", "Guardian"),
+                Arrays.asList("USA", "Canada"),
+                "Other Country",
+                Arrays.asList("New York", "Toronto"),
+                Arrays.asList("Internet", "Friends"),
                 true,
                 1
         );
@@ -306,30 +381,45 @@ public class ApplicationServiceIMPLTest {
                 "Married",
                 new Date(),
                 2,
-                1234567890,
-                1234567890,
-                "email",
+                "1234567890",
+                "1234567890",
+                "email@example.com",
                 "postal address",
                 "school",
+                "OL Exam Type",
+                new Date(),
                 new Date(),
                 "OL Details",
+                "AL Exam Type",
+                new Date(),
                 new Date(),
                 "AL Details",
+                "Degree Type",
+                new Date(),
                 new Date(),
                 "Degree Details",
+                "Other Type",
+                new Date(),
+                new Date(),
+                "Other Details",
+                "Experience Type",
+                new Date(),
                 new Date(),
                 "Experience Details",
+                "IELTS Type",
+                new Date(),
                 new Date(),
                 "IELTS Details",
                 "Preferred Area",
                 true,
-                "Country",
+                "Country Visa Type",
                 true,
                 "Refusal Details",
-                "Sponsor Relationship",
-                "Study Country",
-                "City",
-                "Method of Knowing",
+                Arrays.asList("Parent", "Guardian"),
+                Arrays.asList("USA", "Canada"),
+                "Other Country",
+                Arrays.asList("New York", "Toronto"),
+                Arrays.asList("Internet", "Friends"),
                 true,
                 1
         );
@@ -371,40 +461,54 @@ public class ApplicationServiceIMPLTest {
                 "Married",
                 new Date(),
                 2,
-                1234567890,
-                1234567890,
-                "email",
+                "1234567890",
+                "1234567890",
+                "email@example.com",
                 "postal address",
                 "school",
+                "OL Exam Type",
+                new Date(),
                 new Date(),
                 "OL Details",
+                "AL Exam Type",
+                new Date(),
                 new Date(),
                 "AL Details",
+                "Degree Type",
+                new Date(),
                 new Date(),
                 "Degree Details",
+                "Other Type",
+                new Date(),
+                new Date(),
+                "Other Details",
+                "Experience Type",
+                new Date(),
                 new Date(),
                 "Experience Details",
+                "IELTS Type",
+                new Date(),
                 new Date(),
                 "IELTS Details",
                 "Preferred Area",
                 true,
-                "Country",
+                "Country Visa Type",
                 true,
                 "Refusal Details",
-                "Sponsor Relationship",
-                "Study Country",
-                "City",
-                "Method of Knowing",
+                Arrays.asList("Parent", "Guardian"),
+                Arrays.asList("USA", "Canada"),
+                "Other Country",
+                Arrays.asList("New York", "Toronto"),
+                Arrays.asList("Internet", "Friends"),
                 true,
-                11
+                1
         );
 
         Application existingApplication = getExistingApplication(applicationId);
 
         Application newApplication = new Application();
         newApplication.setApplicationId(applicationId);
-        newApplication.setApplicationTitle(applicationUpdateDTO.getApplicationTitle());
-
+        newApplication.setTitle(applicationUpdateDTO.getTitle());
 
         Reception newReception = new Reception();
         newReception.setReceptionId(applicationUpdateDTO.getReception());
@@ -427,107 +531,15 @@ public class ApplicationServiceIMPLTest {
                 .findById(applicationId);
         verify(receptionRepo, times(1))
                 .findById(applicationUpdateDTO.getReception());
-
-
-
-
         verify(applicationRepo, times(1))
                 .save(applicationArgumentCaptor.capture());
 
         Application updatedApplication = applicationArgumentCaptor.getValue();
 
         assertEquals(applicationId, updatedApplication.getApplicationId());
-        assertEquals(applicationUpdateDTO.getApplicationTitle(), updatedApplication.getApplicationTitle());
+        assertEquals(applicationUpdateDTO.getTitle(), updatedApplication.getTitle());
         assertEquals(applicationUpdateDTO.getReception(), updatedApplication.getReception().getReceptionId());
 
-    }
-
-    @Test
-    public void getStudentBasicDetails_whenApplicationNotFound_throwsNotFoundException() {
-        int applicationId = 1;
-
-        when(applicationRepo.findById(applicationId))
-                .thenReturn(Optional.empty());
-
-        NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> applicationServiceIMPL.getStudentBasicDetails(applicationId));
-
-        assertEquals("Application not found with ID: " + applicationId, exception.getMessage());
-
-        verify(applicationRepo, times(1))
-                .findById(applicationId);
-        verify(modelMapper, never())
-                .map(any(), any());
-    }
-
-    @Test
-    public void getStudentBasicDetails_whenApplicationFound_returnsStudentBasicDetails() {
-        int applicationId = 1;
-        Application application = new Application();
-
-        application.setApplicationId(1);
-
-        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
-
-        when(applicationRepo.findById(applicationId))
-                .thenReturn(Optional.of(application));
-        when(modelMapper.map(application, ApplicationStudentBasicDetailsGetDTO.class))
-                .thenReturn(applicationStudentBasicDetailsGetDTO);
-
-        ApplicationStudentBasicDetailsGetDTO result = applicationServiceIMPL.getStudentBasicDetails(applicationId);
-
-        assertEquals(applicationStudentBasicDetailsGetDTO, result);
-    }
-
-    @Test
-    public void getAllStudentBasicDetails_whenNoApplicationsFound_throwsNotFoundException() {
-        when(applicationRepo.findAll())
-                .thenReturn(emptyList());
-
-        NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> applicationServiceIMPL.getAllStudentBasicDetails());
-
-        assertEquals("No applications found", exception.getMessage());
-
-        verify(applicationRepo, times(1))
-                .findAll();
-        verify(applicationMapper, never())
-                .entityListToDtoList(any());
-    }
-
-    @Test
-    public void getAllStudentBasicDetails_WhenApplicationsFound_returnsApplicationStudentBasicDetailsGetDTOList(){
-        Reception reception = mock(Reception.class);
-
-        ReceptionForApplicationDTO receptionDTO = new ReceptionForApplicationDTO();
-        receptionDTO.setReceptionId(reception.getReceptionId());
-
-        Application application = new Application();
-        application.setApplicationId(1);
-        application.setReception(reception);
-
-        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
-        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
-        applicationStudentBasicDetailsGetDTO.setReception(receptionDTO);
-
-        List<Application> applications = List.of(application);
-
-        when(applicationRepo.findAll())
-                .thenReturn(applications);
-        when(applicationMapper.entityListToDtoList(applications))
-                .thenReturn(List.of(applicationStudentBasicDetailsGetDTO));
-
-        List<ApplicationStudentBasicDetailsGetDTO> result = applicationServiceIMPL.getAllStudentBasicDetails();
-
-        assertEquals(1, result.size());
-        assertEquals(applicationStudentBasicDetailsGetDTO, result.get(0));
-        assertEquals(applicationStudentBasicDetailsGetDTO.getApplicationId(), result.get(0).getApplicationId());
-        assertEquals(applicationStudentBasicDetailsGetDTO.getReception(), result.get(0).getReception());
-
-        verify(applicationRepo, times(1))
-                .findAll();
-        verify(applicationMapper, times(1))
-                .entityListToDtoList(applications);
     }
 
     @Test
@@ -579,12 +591,303 @@ public class ApplicationServiceIMPLTest {
 
     }
 
+    @Test
+    public void getStudentBasicDetails_whenApplicationNotFound_throwsNotFoundException() {
+        int applicationId = 1;
+
+        when(applicationRepo.findById(applicationId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetails(applicationId));
+
+        assertEquals("Application not found with ID: " + applicationId, exception.getMessage());
+
+        verify(applicationRepo, times(1))
+                .findById(applicationId);
+        verify(modelMapper, never())
+                .map(any(), any());
+    }
+
+    @Test
+    public void getStudentBasicDetails_whenApplicationFound_returnsStudentBasicDetails() {
+        int applicationId = 1;
+        Application application = new Application();
+
+        application.setApplicationId(1);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+
+        when(applicationRepo.findById(applicationId))
+                .thenReturn(Optional.of(application));
+        when(applicationMapper.toDto(application))
+                .thenReturn(applicationStudentBasicDetailsGetDTO);
+
+        ApplicationStudentBasicDetailsGetDTO result = applicationServiceIMPL.getStudentBasicDetails(applicationId);
+
+        assertEquals(applicationStudentBasicDetailsGetDTO, result);
+
+        verify(applicationRepo, times(1))
+                .findById(applicationId);
+        verify(applicationMapper, times(1))
+                .toDto(application);
+    }
+
+    @Test
+    public void getAllStudentBasicDetails_whenNoApplicationsFound_throwsNotFoundException() {
+        when(applicationRepo.findAll())
+                .thenReturn(emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getAllStudentBasicDetails());
+
+        assertEquals("No applications found", exception.getMessage());
+
+        verify(applicationRepo, times(1))
+                .findAll();
+        verify(applicationMapper, never())
+                .entityListToDtoList(any());
+    }
+
+    @Test
+    public void getAllStudentBasicDetails_WhenApplicationsFound_returnsApplicationStudentBasicDetailsGetDTOList() {
+        Reception reception = mock(Reception.class);
+
+        ReceptionForApplicationDTO receptionDTO = new ReceptionForApplicationDTO();
+        receptionDTO.setReceptionId(reception.getReceptionId());
+
+        Application application = new Application();
+        application.setApplicationId(1);
+        application.setReception(reception);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
+        applicationStudentBasicDetailsGetDTO.setReception(receptionDTO);
+
+        List<Application> applications = List.of(application);
+
+        when(applicationRepo.findAll())
+                .thenReturn(applications);
+        when(applicationMapper.entityListToDtoList(applications))
+                .thenReturn(List.of(applicationStudentBasicDetailsGetDTO));
+
+        List<ApplicationStudentBasicDetailsGetDTO> result = applicationServiceIMPL.getAllStudentBasicDetails();
+
+        assertEquals(1, result.size());
+        assertEquals(applicationStudentBasicDetailsGetDTO, result.get(0));
+        assertEquals(applicationStudentBasicDetailsGetDTO.getApplicationId(), result.get(0).getApplicationId());
+        assertEquals(applicationStudentBasicDetailsGetDTO.getReception(), result.get(0).getReception());
+
+        verify(applicationRepo, times(1))
+                .findAll();
+        verify(applicationMapper, times(1))
+                .entityListToDtoList(applications);
+    }
+
+    @Test
+    public void getStudentBasicDetailsByStudentId_whenStudentNotFound_throwsNotFoundException() {
+        int studentId = 1;
+        when(studentRepo.findById(studentId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByStudentId(studentId));
+
+        assertEquals("Student not found with ID: " + studentId, exception.getMessage());
+
+        verify(studentRepo, times(1))
+                .findById(studentId);
+        verify(applicationMapper, never())
+                .toDto(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByStudentId_whenStudentFound_returnsStudentBasicDetails() {
+        int studentId = 1;
+        Student student = new Student();
+        student.setStudentId(studentId);
+
+        Application application = new Application();
+        application.setApplicationId(1);
+
+        student.setApplication(application);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
+
+        when(studentRepo.findById(studentId))
+                .thenReturn(Optional.of(student));
+        when(applicationMapper.toDto(application))
+                .thenReturn(applicationStudentBasicDetailsGetDTO);
+
+        ApplicationStudentBasicDetailsGetDTO result = applicationServiceIMPL.getStudentBasicDetailsByStudentId(studentId);
+
+        assertEquals(applicationStudentBasicDetailsGetDTO, result);
+
+        verify(studentRepo, times(1))
+                .findById(studentId);
+        verify(applicationMapper, times(1))
+                .toDto(application);
+    }
+
+    @Test
+    public void getStudentBasicDetailsByReceptionId_whenReceptionNotFound_throwsNotFoundException() {
+        int receptionId = 1;
+        when(receptionRepo.findById(receptionId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByReceptionId(receptionId));
+
+        assertEquals("Reception not found with ID: " + receptionId, exception.getMessage());
+
+        verify(receptionRepo, times(1))
+                .findById(receptionId);
+        verify(applicationRepo, never())
+                .findByReception(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByReceptionId_whenNoApplicationsFound_throwsNotFoundException() {
+        int receptionId = 1;
+        Reception reception = new Reception();
+        reception.setReceptionId(receptionId);
+
+        when(receptionRepo.findById(receptionId))
+                .thenReturn(Optional.of(reception));
+        when(applicationRepo.findByReception(reception))
+                .thenReturn(emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByReceptionId(receptionId));
+
+        assertEquals("No applications found for reception ID: " + receptionId, exception.getMessage());
+
+        verify(receptionRepo, times(1))
+                .findById(receptionId);
+        verify(applicationRepo, times(1))
+                .findByReception(reception);
+        verify(applicationMapper, never())
+                .toDto(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByReceptionId_whenApplicationsFound_returnsStudentBasicDetails() {
+        int receptionId = 1;
+        Reception reception = new Reception();
+        reception.setReceptionId(receptionId);
+
+        Application application = new Application();
+        application.setApplicationId(1);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
+
+        when(receptionRepo.findById(receptionId))
+                .thenReturn(Optional.of(reception));
+        when(applicationRepo.findByReception(reception))
+                .thenReturn(List.of(application));
+        when(applicationMapper.toDto(application))
+                .thenReturn(applicationStudentBasicDetailsGetDTO);
+
+        List<ApplicationStudentBasicDetailsGetDTO> result = applicationServiceIMPL.getStudentBasicDetailsByReceptionId(receptionId);
+
+        assertEquals(1, result.size());
+        assertEquals(applicationStudentBasicDetailsGetDTO, result.get(0));
+
+        verify(receptionRepo, times(1))
+                .findById(receptionId);
+        verify(applicationRepo, times(1))
+                .findByReception(reception);
+        verify(applicationMapper, times(1))
+                .toDto(application);
+    }
+
+    @Test
+    public void getStudentBasicDetailsByCounselorId_whenCounselorNotFound_throwsNotFoundException() {
+        int counselorId = 1;
+        when(counselorRepo.findById(counselorId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByCounselorId(counselorId));
+
+        assertEquals("Counselor not found with ID: " + counselorId, exception.getMessage());
+
+        verify(counselorRepo, times(1))
+                .findById(counselorId);
+        verify(studentRepo, never())
+                .findByCounselorId(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByCounselorId_whenNoStudentsFound_throwsNotFoundException() {
+        int counselorId = 1;
+        Counselor counselor = new Counselor();
+        counselor.setCounselorId(counselorId);
+
+        when(counselorRepo.findById(counselorId))
+                .thenReturn(Optional.of(counselor));
+        when(studentRepo.findByCounselorId(counselor))
+                .thenReturn(emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> applicationServiceIMPL.getStudentBasicDetailsByCounselorId(counselorId));
+
+        assertEquals("No students found for counselor ID: " + counselorId, exception.getMessage());
+
+        verify(counselorRepo, times(1))
+                .findById(counselorId);
+        verify(studentRepo, times(1))
+                .findByCounselorId(counselor);
+        verify(applicationMapper, never())
+                .toDto(any());
+    }
+
+    @Test
+    public void getStudentBasicDetailsByCounselorId_whenStudentsFound_returnsStudentBasicDetails() {
+        int counselorId = 1;
+        Counselor counselor = new Counselor();
+        counselor.setCounselorId(counselorId);
+
+        Student student = new Student();
+        student.setStudentId(1);
+        student.setCounselorId(counselor);
+
+        Application application = new Application();
+        application.setApplicationId(1);
+        student.setApplication(application);
+
+        ApplicationStudentBasicDetailsGetDTO applicationStudentBasicDetailsGetDTO = new ApplicationStudentBasicDetailsGetDTO();
+        applicationStudentBasicDetailsGetDTO.setApplicationId(1);
+
+        when(counselorRepo.findById(counselorId))
+                .thenReturn(Optional.of(counselor));
+        when(studentRepo.findByCounselorId(counselor))
+                .thenReturn(List.of(student));
+
+        when(applicationMapper.toDto(application))
+                .thenReturn(applicationStudentBasicDetailsGetDTO);
+
+        List<ApplicationStudentBasicDetailsGetDTO> result = applicationServiceIMPL.getStudentBasicDetailsByCounselorId(counselorId);
+
+        assertEquals(1, result.size());
+        assertEquals(applicationStudentBasicDetailsGetDTO, result.get(0));
+
+        verify(counselorRepo, times(1))
+                .findById(counselorId);
+        verify(studentRepo, times(1))
+                .findByCounselorId(counselor);
+        verify(applicationMapper, times(1))
+                .toDto(application);
+    }
+
 
     private static Application getExistingApplication(int applicationId) {
         Application existingApplication = new Application();
         existingApplication.setApplicationId(applicationId);
         existingApplication.setApplicationDate(new Date());
-        existingApplication.setApplicationTitle("Application Title Before Update");
+        existingApplication.setTitle("Application Title Before Update");
         existingApplication.setDateOfBirth(new Date());
         existingApplication.setAge(19);
         existingApplication.setFamilyName("Family Name Before Update");
@@ -594,33 +897,46 @@ public class ApplicationServiceIMPLTest {
         existingApplication.setRelationshipStatus("Single");
         existingApplication.setDateOfMarriage(new Date());
         existingApplication.setNumberOfChildren(1);
-        existingApplication.setMobileContactNumber(1234567890);
-        existingApplication.setHomeContactNumber(1234567890);
+        existingApplication.setMobileContactNumber("1234567890");
+        existingApplication.setHomeContactNumber("1234567890");
         existingApplication.setEmail("email Before Update");
         existingApplication.setPostalAddress("postal address Before Update");
         existingApplication.setSchoolAttended("school Before Update");
-        existingApplication.setOlExamYear(new Date());
+        existingApplication.setOlExamType("OL Exam Type Before Update");
+        existingApplication.setOlExamStartYear(new Date());
+        existingApplication.setOlExamEndYear(new Date());
         existingApplication.setOlExamDetails("OL Details Before Update");
-        existingApplication.setAlExamYear(new Date());
+        existingApplication.setAlExamType("AL Exam Type Before Update");
+        existingApplication.setAlExamStartYear(new Date());
+        existingApplication.setAlExamEndYear(new Date());
         existingApplication.setAlExamDetails("AL Details Before Update");
-        existingApplication.setDegreeYear(new Date());
+        existingApplication.setDegreeType("Degree Type Before Update");
+        existingApplication.setDegreeStartYear(new Date());
+        existingApplication.setDegreeEndYear(new Date());
         existingApplication.setDegreeDetails("Degree Details Before Update");
-        existingApplication.setExperienceYear(new Date());
+        existingApplication.setExperienceType("Experience Type Before Update");
+        existingApplication.setExperienceStartYear(new Date());
+        existingApplication.setExperienceEndYear(new Date());
         existingApplication.setExperienceDetails("Experience Details Before Update");
-        existingApplication.setIeltsPteYear(new Date());
+        existingApplication.setIeltsPteType("IELTS Type Before Update");
+        existingApplication.setIeltsPteStartYear(new Date());
+        existingApplication.setIeltsPteEndYear(new Date());
         existingApplication.setIeltsPteDetails("IELTS Details Before Update");
+        existingApplication.setPreferredAreaOfStudy("Preferred Area of Study Before Update");
         existingApplication.setAppliedForVisaBefore(false);
         existingApplication.setCountryVisaTypeApplied("Visa Country Before Update");
         existingApplication.setVisaRefusals(false);
         existingApplication.setVisaRefusalsDetails("Refusal Details Before Update");
-        existingApplication.setSponsorRelationship("Sponsor Relationship Before Update");
-        existingApplication.setPreferredStudyCountry("Study Country Before Update");
-        existingApplication.setPreferredCity("City Before Update");
-        existingApplication.setMethodeOfKnowing("Method of Knowing Before Update");
+        existingApplication.setSponsorRelationship(List.of("Sponsor Relationship Before Update"));
+        existingApplication.setPreferredStudyCountry(List.of("Study Country Before Update"));
+        existingApplication.setPreferredCity(List.of("City Before Update"));
+        existingApplication.setMethodeOfKnowing(List.of("Method of Knowing Before Update"));
+        existingApplication.setVerified(false);
 
         Reception initialReception = new Reception();
         initialReception.setReceptionId(10);
         existingApplication.setReception(initialReception);
+
         return existingApplication;
     }
 

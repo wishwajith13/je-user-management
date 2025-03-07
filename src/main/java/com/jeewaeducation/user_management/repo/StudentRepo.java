@@ -21,5 +21,5 @@ public interface StudentRepo extends JpaRepository<Student, Integer> {
 
     Student findByApplication(Application application);
 
-    List<Student> findByCounselorId_CounselorId(int counselorIdCounselorId);
+    List<Student> findByCounselorId(Counselor counselorId);
 }

@@ -3,11 +3,13 @@ package com.jeewaeducation.user_management.service.impl;
 import com.jeewaeducation.user_management.dto.application.*;
 import com.jeewaeducation.user_management.dto.reception.ReceptionForApplicationDTO;
 import com.jeewaeducation.user_management.entity.Application;
+import com.jeewaeducation.user_management.entity.Counselor;
 import com.jeewaeducation.user_management.entity.Reception;
 import com.jeewaeducation.user_management.entity.Student;
 import com.jeewaeducation.user_management.exception.DuplicateKeyException;
 import com.jeewaeducation.user_management.exception.NotFoundException;
 import com.jeewaeducation.user_management.repo.ApplicationRepo;
+import com.jeewaeducation.user_management.repo.CounselorRepo;
 import com.jeewaeducation.user_management.repo.ReceptionRepo;
 import com.jeewaeducation.user_management.repo.StudentRepo;
 import com.jeewaeducation.user_management.service.ApplicationService;
@@ -28,6 +30,7 @@ public class ApplicationServiceIMPL implements ApplicationService {
     private final ModelMapper modelMapper;
     private final ApplicationMapper applicationMapper;
     private final StudentRepo studentRepo;
+    private final CounselorRepo counselorRepo;
 
     @Transactional
     public String saveApplication(ApplicationSaveDTO applicationSaveDTO) {
@@ -106,14 +109,6 @@ public class ApplicationServiceIMPL implements ApplicationService {
     }
 
     @Override
-    public ApplicationStudentBasicDetailsGetDTO getStudentBasicDetailsByStudentId(int studentId) {
-        Student student = studentRepo.findById(studentId).orElseThrow(() ->
-                new NotFoundException("Student not found with ID: " + studentId));
-        Application application = student.getApplication();
-        return applicationMapper.toDto(application);
-    }
-
-    @Override
     public List<ApplicationStudentBasicDetailsGetDTO> getAllStudentBasicDetails() {
         List<Application> applications = applicationRepo.findAll();
         if (applications.isEmpty()) {
@@ -121,6 +116,14 @@ public class ApplicationServiceIMPL implements ApplicationService {
         }
         return applicationMapper.entityListToDtoList(applications);
 
+    }
+
+    @Override
+    public ApplicationStudentBasicDetailsGetDTO getStudentBasicDetailsByStudentId(int studentId) {
+        Student student = studentRepo.findById(studentId).orElseThrow(() ->
+                new NotFoundException("Student not found with ID: " + studentId));
+        Application application = student.getApplication();
+        return applicationMapper.toDto(application);
     }
 
     @Override
@@ -139,7 +142,14 @@ public class ApplicationServiceIMPL implements ApplicationService {
 
     @Override
     public List<ApplicationStudentBasicDetailsGetDTO> getStudentBasicDetailsByCounselorId(int counselorId) {
-        List<Student> students = studentRepo.findByCounselorId_CounselorId(counselorId);
+        Counselor counselor = counselorRepo.findById(counselorId).orElseThrow(() ->
+                new NotFoundException("Counselor not found with ID: " + counselorId));
+
+        List<Student> students = studentRepo.findByCounselorId(counselor);
+
+        if(students.isEmpty()){
+            throw new NotFoundException("No students found for counselor ID: " + counselorId);
+        }
 
         List<Application> applications = students.stream()
                 .map(Student::getApplication)
