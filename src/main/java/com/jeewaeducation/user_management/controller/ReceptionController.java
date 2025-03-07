@@ -1,6 +1,7 @@
 package com.jeewaeducation.user_management.controller;
 
 import com.jeewaeducation.user_management.dto.reception.ReceptionDTO;
+import com.jeewaeducation.user_management.dto.reception.ReceptionGetDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionSaveDTO;
 import com.jeewaeducation.user_management.service.ReceptionService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
@@ -43,6 +44,14 @@ public class ReceptionController {
     )
     public ResponseEntity<StandardResponse> getReception(@PathVariable int id) {
         ReceptionDTO message = receptionService.getReception(id);
+        return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
+    }
+
+    @GetMapping(
+            path = {"/branch/{branchId}"}
+    )
+    public ResponseEntity<StandardResponse> getReceptionsByBranchId(@PathVariable int branchId) {
+        List<ReceptionGetDTO> message = receptionService.getReceptionsByBranchId(branchId);
         return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }
 

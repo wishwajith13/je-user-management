@@ -1,7 +1,9 @@
 package com.jeewaeducation.user_management.service.impl;
 
 import com.jeewaeducation.user_management.dto.reception.ReceptionDTO;
+import com.jeewaeducation.user_management.dto.reception.ReceptionGetDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionSaveDTO;
+import com.jeewaeducation.user_management.entity.Application;
 import com.jeewaeducation.user_management.entity.Branch;
 import com.jeewaeducation.user_management.entity.Reception;
 import com.jeewaeducation.user_management.exception.ForeignKeyConstraintViolationException;
@@ -16,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +64,28 @@ public class ReceptionServiceIMPL implements ReceptionService {
     public ReceptionDTO getReception(int id) {
         Reception reception = receptionRepo.findById(id).orElseThrow(() -> new NotFoundException("Reception not found"));
         return modelMapper.map(reception, ReceptionDTO.class);
+    }
+
+    @Override
+    public List<ReceptionGetDTO> getReceptionsByBranchId(int branchId){
+        Branch branch = branchRepo.findById(branchId)
+                .orElseThrow(() -> new NotFoundException("Branch not found"));
+        List<Reception> receptions = receptionRepo.findAllByBranch(branch);
+
+        if (receptions.isEmpty()) {
+            throw new NotFoundException("No receptions found");
+        }
+        return receptions.stream()
+                .map(reception -> {
+                    ReceptionGetDTO receptionGetDTO = modelMapper.map(reception, ReceptionGetDTO.class);
+                    List<Integer> applicationIds = applicationRepo.findByReception(reception)
+                            .stream()
+                            .map(Application::getApplicationId)
+                            .collect(Collectors.toList());
+                    receptionGetDTO.setApplicationIds(applicationIds);
+                    return receptionGetDTO;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
