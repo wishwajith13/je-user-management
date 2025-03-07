@@ -78,6 +78,9 @@ public class CounselorServiceIMPL implements CounselorService {
     @Override
     public List<CounselorGetDTO> getAllCounselors() {
         List<Counselor> counselors = counselorRepo.findAll();
+        if (counselors.isEmpty()) {
+            throw new NotFoundException("No Counselors Found");
+        }
         return modelMapper.map(counselors, new TypeToken<List<CounselorGetDTO>>() {}.getType());
     }
 
@@ -85,6 +88,9 @@ public class CounselorServiceIMPL implements CounselorService {
     public List<CounselorGetDTO> getCounselorsByBranchId(int branchId) {
         Branch branch = branchRepo.findById(branchId).orElseThrow(() -> new NotFoundException("Branch not found"));
         List<Counselor> counselors = counselorRepo.findByBranch(branch);
+        if (counselors.isEmpty()) {
+            throw new NotFoundException("No Counselors Found");
+        }
         return modelMapper.map(counselors, new TypeToken<List<CounselorGetDTO>>() {}.getType());
     }
 

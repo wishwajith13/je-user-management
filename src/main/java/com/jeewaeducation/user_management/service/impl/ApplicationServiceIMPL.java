@@ -100,7 +100,6 @@ public class ApplicationServiceIMPL implements ApplicationService {
         return application.getApplicationId() + "Updated " + "Verification Status: " + application.isVerified();
     }
 
-
     @Override
     public ApplicationStudentBasicDetailsGetDTO getStudentBasicDetails(int id) {
         Application application = applicationRepo.findById(id).orElseThrow(() ->
