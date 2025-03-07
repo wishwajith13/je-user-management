@@ -157,56 +157,53 @@ class CounselorServiceIMPLTest {
                 () -> counselorServiceIMPL.updateCounselor(counselorSaveDTO, counselorId));
 
         assertEquals("Branch not found", exception.getMessage());
+
+        verify(branchRepo, times(1))
+                .findById(1);
         verify(modelMapper,never()).map(any(), any());
         verify(counselorRepo, never()).save(any());
     }
 
     @Test
     public void updateCounselor_WhenCounselorNotFound_ThrowNotFoundException() {
-        CounselorSaveDTO counselorSaveDTO = new CounselorSaveDTO();
-        counselorSaveDTO.setBranch(1);
-        counselorSaveDTO.setCounselorName("Test");
-        counselorSaveDTO.setCounselorPhoneNumber("1234567890");
+        CounselorSaveDTO counselorSaveDTO = new CounselorSaveDTO(
+                1,
+                "Test",
+                "1234567890",
+                "Test"
+        );
         int counselorId = 1;
 
         Branch branch = new Branch();
         branch.setBranchId(1);
 
-        Counselor counselor = new Counselor();
-        counselor.setCounselorId(1);
-        counselor.setBranch(branch);
-        counselor.setCounselorName("Test");
-        counselor.setCounselorPhoneNumber("1234567890");
-
-        when(branchRepo.findById(1))
+        when(branchRepo.findById(counselorSaveDTO.getBranch()))
                 .thenReturn(Optional.of(branch));
-
-        when(modelMapper.map(counselorSaveDTO, Counselor.class))
-                .thenReturn(counselor);
-
-        when(counselorRepo.existsById(counselorId))
-                .thenReturn(false);
+        when(counselorRepo.findById(counselorId))
+                .thenReturn(Optional.empty());
 
         Exception exception = assertThrows(NotFoundException.class,
                 () -> counselorServiceIMPL.updateCounselor(counselorSaveDTO, counselorId));
 
-        assertEquals("Counselor Not Found", exception.getMessage());
+        assertEquals("Counselor not found", exception.getMessage());
 
         verify(branchRepo, times(1))
                 .findById(1);
-        verify(modelMapper, times(1))
-                .map(counselorSaveDTO, Counselor.class);
-        verify(counselorRepo, never())
-                .save(any());
+        verify(counselorRepo, times(1))
+                .findById(counselorId);
+        verify(modelMapper,never()).map(any(), any());
+        verify(counselorRepo, never()).save(any());
 
     }
 
     @Test
     public void updateCounselor_WhenCounselorFound_UpdateCounselor() {
-        CounselorSaveDTO counselorSaveDTO = new CounselorSaveDTO();
-        counselorSaveDTO.setBranch(1);
-        counselorSaveDTO.setCounselorName("Test");
-        counselorSaveDTO.setCounselorPhoneNumber("1234567890");
+        CounselorSaveDTO counselorSaveDTO = new CounselorSaveDTO(
+                1,
+                "Test",
+                "1234567890",
+                "Test"
+        );
         int counselorId = 1;
 
         Branch branch = new Branch();
@@ -218,14 +215,12 @@ class CounselorServiceIMPLTest {
         counselor.setCounselorName("Updated Test");
         counselor.setCounselorPhoneNumber("1234567890");
 
-        when(branchRepo.findById(1))
+        when(branchRepo.findById(counselorSaveDTO.getBranch()))
                 .thenReturn(Optional.of(branch));
-
+        when(counselorRepo.findById(counselorId))
+                .thenReturn(Optional.of(counselor));
         when(modelMapper.map(counselorSaveDTO, Counselor.class))
                 .thenReturn(counselor);
-
-        when(counselorRepo.existsById(counselorId))
-                .thenReturn(true);
 
 
         ArgumentCaptor<Counselor> counselorArgumentCaptor = ArgumentCaptor.forClass(Counselor.class);
@@ -235,7 +230,7 @@ class CounselorServiceIMPLTest {
 
         String result = counselorServiceIMPL.updateCounselor(counselorSaveDTO, counselorId);
 
-        assertEquals(counselor+"Counselor Updated", result);
+        assertEquals("Counselor Updated with ID: " + counselorId, result);
 
         Counselor capturedCounselor = counselorArgumentCaptor.getValue();
 
@@ -245,6 +240,8 @@ class CounselorServiceIMPLTest {
 
         verify(branchRepo, times(1))
                 .findById(1);
+        verify(counselorRepo, times(1))
+                .findById(counselorId);
         verify(modelMapper, times(1))
                 .map(counselorSaveDTO, Counselor.class);
         verify(counselorRepo, times(1))
@@ -307,6 +304,22 @@ class CounselorServiceIMPLTest {
     }
 
     @Test
+    public void getAllCounselors_WhenNoCounselorsFound_ThrowNotFoundException() {
+        when(counselorRepo.findAll())
+                .thenReturn(java.util.List.of());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> counselorServiceIMPL.getAllCounselors());
+
+        assertEquals("No Counselors Found", exception.getMessage());
+
+        verify(counselorRepo, times(1))
+                .findAll();
+        verify(modelMapper, never())
+                .map(any(), any());
+    }
+
+    @Test
     public void getAllCounselors_ReturnAllCounselors() {
         Counselor counselor1 = new Counselor();
         counselor1.setCounselorId(1);
@@ -340,6 +353,93 @@ class CounselorServiceIMPLTest {
 
         verify(counselorRepo, times(1))
                 .findAll();
+        verify(modelMapper, times(1))
+                .map(java.util.List.of(counselor1, counselor2), new TypeToken<List<CounselorGetDTO>>() {}.getType());
+    }
+
+    @Test
+    public void getCounselorsByBranchId_WhenBranchNotFound_ThrowNotFoundException() {
+        int branchId = 1;
+        when(branchRepo.findById(branchId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> counselorServiceIMPL.getCounselorsByBranchId(branchId));
+
+        assertEquals("Branch not found", exception.getMessage());
+
+        verify(branchRepo, times(1))
+                .findById(branchId);
+        verify(counselorRepo, never())
+                .findByBranch(any());
+        verify(modelMapper, never())
+                .map(any(), any());
+    }
+
+    @Test
+    public void getCounselorsByBranchId_WhenNoCounselorsFound_ThrowNotFoundException() {
+        int branchId = 1;
+        Branch branch = new Branch();
+        branch.setBranchId(1);
+        when(branchRepo.findById(branchId))
+                .thenReturn(Optional.of(branch));
+        when(counselorRepo.findByBranch(branch))
+                .thenReturn(java.util.List.of());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> counselorServiceIMPL.getCounselorsByBranchId(branchId));
+
+        assertEquals("No Counselors Found", exception.getMessage());
+
+        verify(branchRepo, times(1))
+                .findById(branchId);
+        verify(counselorRepo, times(1))
+                .findByBranch(branch);
+        verify(modelMapper, never())
+                .map(any(), any());
+    }
+
+    @Test
+    public void getCounselorsByBranchId_ReturnCounselors() {
+        int branchId = 1;
+        Branch branch = new Branch();
+        branch.setBranchId(1);
+
+        Counselor counselor1 = new Counselor();
+        counselor1.setCounselorId(1);
+        counselor1.setCounselorName("Test1");
+        counselor1.setCounselorPhoneNumber("1234567890");
+
+        Counselor counselor2 = new Counselor();
+        counselor2.setCounselorId(2);
+        counselor2.setCounselorName("Test2");
+        counselor2.setCounselorPhoneNumber("1234567890");
+
+        CounselorGetDTO counselorGetDTO1 = new CounselorGetDTO();
+        counselorGetDTO1.setCounselorId(1);
+        counselorGetDTO1.setCounselorName("Test1");
+        counselorGetDTO1.setCounselorPhoneNumber("1234567890");
+
+        CounselorGetDTO counselorGetDTO2 = new CounselorGetDTO();
+        counselorGetDTO2.setCounselorId(2);
+        counselorGetDTO2.setCounselorName("Test2");
+        counselorGetDTO2.setCounselorPhoneNumber("1234567890");
+
+        when(branchRepo.findById(branchId))
+                .thenReturn(Optional.of(branch));
+        when(counselorRepo.findByBranch(branch))
+                .thenReturn(java.util.List.of(counselor1, counselor2));
+        when(modelMapper.map(java.util.List.of(counselor1, counselor2), new TypeToken<List<CounselorGetDTO>>() {}.getType()))
+                .thenReturn(java.util.List.of(counselorGetDTO1, counselorGetDTO2));
+
+        List<CounselorGetDTO> result = counselorServiceIMPL.getCounselorsByBranchId(branchId);
+
+        assertEquals(java.util.List.of(counselorGetDTO1, counselorGetDTO2), result);
+
+        verify(branchRepo, times(1))
+                .findById(branchId);
+        verify(counselorRepo, times(1))
+                .findByBranch(branch);
         verify(modelMapper, times(1))
                 .map(java.util.List.of(counselor1, counselor2), new TypeToken<List<CounselorGetDTO>>() {}.getType());
     }
