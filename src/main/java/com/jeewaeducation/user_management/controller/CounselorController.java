@@ -4,6 +4,7 @@ import com.jeewaeducation.user_management.dto.counselor.CounselorGetDTO;
 import com.jeewaeducation.user_management.dto.counselor.CounselorSaveDTO;
 import com.jeewaeducation.user_management.service.CounselorService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class CounselorController {
     private CounselorService counselorService;
 
     @PostMapping
-    public ResponseEntity<StandardResponse> saveCounselor(@RequestBody CounselorSaveDTO counselorSaveDTO){
+    public ResponseEntity<StandardResponse> saveCounselor(@Valid @RequestBody CounselorSaveDTO counselorSaveDTO){
         String message = counselorService.saveCounselor(counselorSaveDTO);
         return new ResponseEntity<>(new StandardResponse(201,"success",message), HttpStatus.CREATED);
     }
@@ -46,7 +47,7 @@ public class CounselorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StandardResponse> updateCounselor(@RequestBody CounselorSaveDTO counselorSaveDTO,@PathVariable int id){
+    public ResponseEntity<StandardResponse> updateCounselor(@Valid @RequestBody CounselorSaveDTO counselorSaveDTO,@PathVariable int id){
         String message = counselorService.updateCounselor(counselorSaveDTO,id);
         return new ResponseEntity<>(new StandardResponse(201,"updated",message ),HttpStatus.ACCEPTED);
     }
