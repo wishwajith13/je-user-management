@@ -5,6 +5,7 @@ import com.jeewaeducation.user_management.dto.reception.ReceptionGetDTO;
 import com.jeewaeducation.user_management.dto.reception.ReceptionSaveDTO;
 import com.jeewaeducation.user_management.service.ReceptionService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class ReceptionController {
     private final ReceptionService receptionService;
 
     @PostMapping
-    private ResponseEntity<StandardResponse> saveReception(ReceptionSaveDTO receptionSaveDTO) {
+    private ResponseEntity<StandardResponse> saveReception(@Valid @RequestBody ReceptionSaveDTO receptionSaveDTO) {
         String message = receptionService.saveReception(receptionSaveDTO);
         return new ResponseEntity<>(new StandardResponse(201, "Success", message), HttpStatus.CREATED);
     }
@@ -56,7 +57,7 @@ public class ReceptionController {
     }
 
     @PutMapping
-    public ResponseEntity<StandardResponse> updateReception(@RequestBody ReceptionSaveDTO receptionSaveDTO, int receptionId) {
+    public ResponseEntity<StandardResponse> updateReception(@Valid @RequestBody ReceptionSaveDTO receptionSaveDTO, int receptionId) {
         String message = receptionService.updateReception(receptionSaveDTO, receptionId);
         return new ResponseEntity<>(new StandardResponse(200, "Success", message), HttpStatus.OK);
     }

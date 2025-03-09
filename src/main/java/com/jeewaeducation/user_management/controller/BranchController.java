@@ -6,6 +6,7 @@ import com.jeewaeducation.user_management.dto.branch.BranchSaveDTO;
 import com.jeewaeducation.user_management.dto.branch.Branch_BranchManagerDTO;
 import com.jeewaeducation.user_management.service.BranchService;
 import com.jeewaeducation.user_management.utility.StandardResponse;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class BranchController {
     private BranchService branchService;
 
     @PostMapping
-    public ResponseEntity<StandardResponse> saveBranch(@RequestBody BranchSaveDTO branchSaveDTO) {
+    public ResponseEntity<StandardResponse> saveBranch(@Valid @RequestBody BranchSaveDTO branchSaveDTO) {
         try {
             return new ResponseEntity<>(new StandardResponse(200, "Success", branchService.saveBranch(branchSaveDTO)), HttpStatus.OK);
         } catch (Exception e) {
@@ -32,7 +33,7 @@ public class BranchController {
     }
 
     @PutMapping
-    public ResponseEntity<StandardResponse> updateBranch(@RequestBody BranchDTO branchDTO) {
+    public ResponseEntity<StandardResponse> updateBranch(@Valid @RequestBody BranchDTO branchDTO) {
         try {
             return new ResponseEntity<>(new StandardResponse(200, "Success", branchService.updateBranch(branchDTO)), HttpStatus.OK);
         } catch (Exception e) {
